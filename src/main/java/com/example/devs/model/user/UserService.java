@@ -3,11 +3,8 @@ package com.example.devs.model.user;
 import com.example.devs._core.enums.UserProvider;
 import com.example.devs._core.enums.UserRole;
 import com.example.devs._core.enums.UserStatus;
-import com.example.devs._core.utils.HttpHeadersConstants;
-import com.example.devs._core.utils.JwtUtil;
+import com.example.devs._core.utils.*;
 import com.example.devs._core.errors.exception.Exception404;
-import com.example.devs._core.utils.EncryptUtil;
-import com.example.devs._core.utils.JwtVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -33,8 +30,13 @@ public class UserService {
     final String KAKAO_REDIRECT_URI = "http://localhost:8080/api/users/oauth/kakao"; // 카카오 리디렉션 URI
     final String KAKAO_TOKEN_REQUEST_URL = "https://kauth.kakao.com/oauth/token"; // 카카오 토큰 요청 URL
     final String KAKAO_USER_INFO_URL = "https://kapi.kakao.com/v2/user/me"; // 카카오 사용자 정보 요청 URL
+    final String NAVER_CLIENT_ID = "nfdBh7_HSSjdAvaBPLWs"; // 네이버 클라이언트 ID
+    final String NAVER_CLIENT_SECRET = "zgUl5Ga7qs"; // 네이버 시크릿 키
+    final String NAVER_REDIRECT_URI = "http://localhost:8080/api/users/oauth/never"; // 네이버 리디렉션 URI
+    final String NAVER_TOKEN_REQUEST_URL = "https://nid.naver.com/oauth2.0/token"; // 네이버 토큰 요청 URL
+    final String NAVER_USER_INFO_URL = "https://openapi.naver.com/v1/nid/me"; // 네이버 사용자 정보 요청 URL
 
-    public String kakaoLogin(String code){
+    public String kakaoLogin(String code) {
         // 1. RestTemplate 설정
         RestTemplate restTemplate = new RestTemplate();
 
@@ -53,11 +55,11 @@ public class UserService {
         HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(tokenRequestBody, tokenRequestHeaders);
 
         // 1-4. api 요청하기 (토큰 받기)
-        ResponseEntity<UserResponse.TokenDTO> token = restTemplate.exchange(
+        ResponseEntity<UserResponse.KakaoTokenDTO> token = restTemplate.exchange(
                 KAKAO_TOKEN_REQUEST_URL,
                 HttpMethod.POST,
                 tokenRequest,
-                UserResponse.TokenDTO.class);
+                UserResponse.KakaoTokenDTO.class);
 
         // 2. 토큰으로 사용자 정보 받기
         HttpHeaders userInfoRequestHeaders = new HttpHeaders();
@@ -78,7 +80,7 @@ public class UserService {
         // FIXME: 카카오 정보가 제한적이라 유니크한 값을 어떤 것으로 지정해야 할지 모르겠음
         User loginUser = userRepository.findByEmailV2(email);
 
-        // 4. 있으면? - 조회된 유저정보 리턴
+        // 4. 회원인 경우 회원이 아닌 경우 판별
         if(loginUser != null){
             // 회원인 경우
             System.out.println("########## 회원인 경우 ##########");
@@ -89,7 +91,6 @@ public class UserService {
             User user = User.builder()
                     // FIXME: 메일이 안받아져요.
                     .email(email)
-                    .password(UUID.randomUUID().toString())
                     .nickname(userInfoResponse.getBody().getProperties().getNickname())
                     // FIXME: 이름이 안받아져요.
                     .username("김덕배")
@@ -101,6 +102,73 @@ public class UserService {
                     .role(UserRole.USER)
                     // .providerId("프로바이더 고유 번호가 뭐죠?")
                     .provider(UserProvider.KAKAO)
+                    .status(UserStatus.ACTIVE)
+                    .build();
+            User joinUser = userRepository.save(user);
+            return JwtUtil.userCreate(joinUser);
+        }
+    }
+
+    public String naverLogin(String code) {
+        // 1. RestTemplate 설정
+        RestTemplate restTemplate = new RestTemplate();
+
+        // 1-1. http header 설정
+        HttpHeaders tokenRequestHeaders = new HttpHeaders();
+        tokenRequestHeaders.add(HttpHeadersConstants.CONTENT_TYPE, HttpHeadersConstants.CONTENT_TYPE_FORM_URLENCODED_UTF8);
+
+        // 1-2. http body 설정
+        MultiValueMap<String, String> tokenRequestBody = new LinkedMultiValueMap<>();
+        tokenRequestBody.add("grant_type", GRANT_TYPE);
+        tokenRequestBody.add("client_id", NAVER_CLIENT_ID);
+        tokenRequestBody.add("client_secret", NAVER_CLIENT_SECRET);
+        tokenRequestBody.add("redirect_uri", NAVER_REDIRECT_URI);
+        tokenRequestBody.add("code", code);
+
+        // 1-3. body + header 객체 만들기
+        HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(tokenRequestBody, tokenRequestHeaders);
+
+        // 1-4. api 요청하기 (토큰 받기)
+        ResponseEntity<UserResponse.NaverTokenDTO> token = restTemplate.exchange(
+                NAVER_TOKEN_REQUEST_URL,
+                HttpMethod.POST,
+                tokenRequest,
+                UserResponse.NaverTokenDTO.class);
+
+        // 2. 토큰으로 사용자 정보 받기
+        HttpHeaders userInfoRequestHeaders = new HttpHeaders();
+        userInfoRequestHeaders.add(HttpHeadersConstants.CONTENT_TYPE, HttpHeadersConstants.CONTENT_TYPE_FORM_URLENCODED_UTF8);
+        userInfoRequestHeaders.add(JwtVO.HEADER, JwtVO.PREFIX + token.getBody().getAccessToken());
+
+        HttpEntity<MultiValueMap<String, String>> userInfoRequest = new HttpEntity<>(userInfoRequestHeaders);
+
+        ResponseEntity<UserResponse.NaverUserDTO> userInfoResponse = restTemplate.exchange(
+                NAVER_USER_INFO_URL,
+                HttpMethod.GET,
+                userInfoRequest,
+                UserResponse.NaverUserDTO.class);
+
+        // 3. 해당정보로 DB조회 (회원인 경우, 회원이 아닌 경우)
+        User loginUser = userRepository.findByEmailV2(userInfoResponse.getBody().getResponse().getEmail());
+
+        // 4. 회원인 경우 회원이 아닌 경우 판별
+        if(loginUser != null){
+            // 회원인 경우
+            System.out.println("########## 회원인 경우 ##########");
+            return JwtUtil.userCreate(loginUser);
+        }else{
+            // 회원이 아닌 경우: 가입 후 로그인
+            System.out.println("########## 회원이 아닌 경우 ##########");
+            User user = User.builder()
+                    .email(userInfoResponse.getBody().getResponse().getEmail())
+                    .nickname(userInfoResponse.getBody().getResponse().getNickname())
+                    .username(userInfoResponse.getBody().getResponse().getName())
+                    .phone(userInfoResponse.getBody().getResponse().getMobile())
+                    .birth(LocalDateTimeFormatter.parseBirth(userInfoResponse.getBody().getResponse().getBirthyear(), userInfoResponse.getBody().getResponse().getBirthday()))
+                    .image(userInfoResponse.getBody().getResponse().getProfileImage())
+                    .role(UserRole.USER)
+                    // .providerId("프로바이더 고유 번호가 뭐죠?")
+                    .provider(UserProvider.NAVER)
                     .status(UserStatus.ACTIVE)
                     .build();
             User joinUser = userRepository.save(user);

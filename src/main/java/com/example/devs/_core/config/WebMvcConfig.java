@@ -19,7 +19,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns("")
                 .excludePathPatterns("/api/users/login")
                 .excludePathPatterns("/api/users/join")
-                .excludePathPatterns("/api/users/oauth/kakao");
+                .excludePathPatterns("/api/users/oauth/kakao")
+                .excludePathPatterns("/api/users/oauth/naver");
     }
 
     // 외부 폴더에서 이미지파일 리소스를 가져오는 방법

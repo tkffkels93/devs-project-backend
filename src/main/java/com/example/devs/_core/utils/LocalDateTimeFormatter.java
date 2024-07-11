@@ -1,6 +1,7 @@
 package com.example.devs._core.utils;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -39,5 +40,15 @@ public class LocalDateTimeFormatter {
         } else if (diffSeconds > 0) {
             return diffSeconds + "초 전";
         } else return null;
+    }
+
+    public static LocalDate parseBirth(String birthyear, String birthday) {
+        // 합친 문자열을 "yyyy-MM-dd" 형식으로 만듭니다.
+        String combinedDate = birthyear + "-" + birthday;
+
+        // DateTimeFormatter를 사용하여 문자열을 LocalDate로 변환합니다.
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        return LocalDate.parse(combinedDate, formatter);
     }
 }
