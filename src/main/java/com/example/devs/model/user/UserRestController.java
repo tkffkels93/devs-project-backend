@@ -19,4 +19,15 @@ public class UserRestController {
         String jwt = userService.login(loginDTO);
         return ResponseEntity.ok().header(JwtVO.HEADER, JwtVO.PREFIX+ jwt).body(new ApiUtil<>(null)); // header 문법
     }
+
+    @PostMapping("/join")
+    public ResponseEntity<?> join(UserRequest.JoinDTO joinDTO){
+        User savedUser = userService.join(joinDTO);
+        if(savedUser != null && savedUser.getId()!=null){
+            return ResponseEntity.ok(new ApiUtil<>(null)); //회원가입성공
+        }else return ResponseEntity.ok(new ApiUtil<>(201, "회원 가입 실패")); // header 문법
+
+    }
+
+
 }
