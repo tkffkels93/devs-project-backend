@@ -1,18 +1,25 @@
 package com.example.devs._core.config;
 
 import com.example.devs._core.interceptor.LoginInterceptor;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.resource.PathResourceResolver;
 
+
+@Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         System.out.println("인터셉터 등록됨============================================================");
         registry.addInterceptor(new LoginInterceptor())
                 .addPathPatterns("/api/**")
-                .excludePathPatterns("");
+                .addPathPatterns("/admin/**")
+                .excludePathPatterns("")
+                .excludePathPatterns("/api/users/login")
+                .excludePathPatterns("/api/users/join")
+                .excludePathPatterns("/api/users/oauth/kakao");
     }
 
     // 외부 폴더에서 이미지파일 리소스를 가져오는 방법
