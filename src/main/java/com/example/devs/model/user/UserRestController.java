@@ -3,6 +3,7 @@ package com.example.devs.model.user;
 import com.example.devs._core.utils.ApiUtil;
 import com.example.devs._core.utils.JwtVO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserRestController {
     private final UserService userService;
+
+    // https://kauth.kakao.com/oauth/authorize?redirect_uri=http://localhost:8080/api/users/oauth/kakao&response_type=code&client_id=3e811404984aeead4e15eeeb1393907f
+    // 카카오 로그인
+    @GetMapping("/oauth/kakao")
+    public ResponseEntity<?> kakaoLogin(String code){
+        String jwt = userService.kakaoLogin(code);
+        return ResponseEntity.ok().header(JwtVO.HEADER, JwtVO.PREFIX + jwt).body(new ApiUtil<>(null));
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(UserRequest.LoginDTO loginDTO){
