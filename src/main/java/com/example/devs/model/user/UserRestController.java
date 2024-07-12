@@ -20,7 +20,9 @@ public class UserRestController {
     @GetMapping("/oauth/kakao")
     public ResponseEntity<?> kakaoLogin(String code){
         String jwt = userService.kakaoLogin(code);
-        return ResponseEntity.ok().header(JwtVO.HEADER, JwtVO.PREFIX + jwt).body(new ApiUtil<>(null));
+        return ResponseEntity.ok()
+                .header(JwtVO.HEADER, JwtVO.PREFIX + jwt)
+                .body(new ApiUtil<>(null));
     }
 
     // https://nid.naver.com/oauth2.0/authorize?redirect_uri=http://localhost:8080/api/users/oauth/naver&response_type=code&client_id=nfdBh7_HSSjdAvaBPLWs
@@ -28,7 +30,9 @@ public class UserRestController {
     @GetMapping("/oauth/naver")
     public  ResponseEntity<?> naverLogin(String code){
         String jwt = userService.naverLogin(code);
-        return ResponseEntity.ok().header(JwtVO.HEADER, JwtVO.PREFIX + jwt).body(new ApiUtil<>(null));
+        return ResponseEntity.ok()
+                .header(JwtVO.HEADER, JwtVO.PREFIX + jwt)
+                .body(new ApiUtil<>(null));
     }
 
     @PostMapping("/login")

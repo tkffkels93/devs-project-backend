@@ -112,18 +112,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // OAuth2.0 인증을 위한 상수 정의
-    final String GRANT_TYPE = "authorization_code"; // OAuth2.0 인증 타입
-    final String KAKAO_CLIENT_ID = "3e811404984aeead4e15eeeb1393907f"; // 카카오 클라이언트 ID
-    final String KAKAO_REDIRECT_URI = "http://localhost:8080/api/users/oauth/kakao"; // 카카오 리디렉션 URI
-    final String KAKAO_TOKEN_REQUEST_URL = "https://kauth.kakao.com/oauth/token"; // 카카오 토큰 요청 URL
-    final String KAKAO_USER_INFO_URL = "https://kapi.kakao.com/v2/user/me"; // 카카오 사용자 정보 요청 URL
-    final String NAVER_CLIENT_ID = "nfdBh7_HSSjdAvaBPLWs"; // 네이버 클라이언트 ID
-    final String NAVER_CLIENT_SECRET = "zgUl5Ga7qs"; // 네이버 시크릿 키
-    final String NAVER_REDIRECT_URI = "http://localhost:8080/api/users/oauth/never"; // 네이버 리디렉션 URI
-    final String NAVER_TOKEN_REQUEST_URL = "https://nid.naver.com/oauth2.0/token"; // 네이버 토큰 요청 URL
-    final String NAVER_USER_INFO_URL = "https://openapi.naver.com/v1/nid/me"; // 네이버 사용자 정보 요청 URL
-
+    // 카카오 로그인
     public String kakaoLogin(String code) {
         // 1. RestTemplate 설정
         RestTemplate restTemplate = new RestTemplate();
@@ -134,9 +123,9 @@ public class UserService {
 
         // 1-2. http body 설정
         MultiValueMap<String, String> tokenRequestBody = new LinkedMultiValueMap<>();
-        tokenRequestBody.add("grant_type", GRANT_TYPE);
-        tokenRequestBody.add("client_id", KAKAO_CLIENT_ID);
-        tokenRequestBody.add("redirect_uri", KAKAO_REDIRECT_URI);
+        tokenRequestBody.add("grant_type", OauthConstants.GRANT_TYPE);
+        tokenRequestBody.add("client_id", OauthConstants.KAKAO_CLIENT_ID);
+        tokenRequestBody.add("redirect_uri", OauthConstants.KAKAO_REDIRECT_URI);
         tokenRequestBody.add("code", code);
 
         // 1-3. body + header 객체 만들기
@@ -144,7 +133,7 @@ public class UserService {
 
         // 1-4. api 요청하기 (토큰 받기)
         ResponseEntity<UserResponse.KakaoTokenDTO> token = restTemplate.exchange(
-                KAKAO_TOKEN_REQUEST_URL,
+                OauthConstants.KAKAO_TOKEN_REQUEST_URL,
                 HttpMethod.POST,
                 tokenRequest,
                 UserResponse.KakaoTokenDTO.class);
@@ -157,7 +146,7 @@ public class UserService {
         HttpEntity<MultiValueMap<String, String>> userInfoRequest = new HttpEntity<>(userInfoRequestHeaders);
 
         ResponseEntity<UserResponse.KakaoUserDTO> userInfoResponse = restTemplate.exchange(
-                KAKAO_USER_INFO_URL,
+                OauthConstants.KAKAO_USER_INFO_URL,
                 HttpMethod.GET,
                 userInfoRequest,
                 UserResponse.KakaoUserDTO.class);
@@ -197,6 +186,7 @@ public class UserService {
         }
     }
 
+    // 네이버 로그인
     public String naverLogin(String code) {
         // 1. RestTemplate 설정
         RestTemplate restTemplate = new RestTemplate();
@@ -207,10 +197,10 @@ public class UserService {
 
         // 1-2. http body 설정
         MultiValueMap<String, String> tokenRequestBody = new LinkedMultiValueMap<>();
-        tokenRequestBody.add("grant_type", GRANT_TYPE);
-        tokenRequestBody.add("client_id", NAVER_CLIENT_ID);
-        tokenRequestBody.add("client_secret", NAVER_CLIENT_SECRET);
-        tokenRequestBody.add("redirect_uri", NAVER_REDIRECT_URI);
+        tokenRequestBody.add("grant_type", OauthConstants.GRANT_TYPE);
+        tokenRequestBody.add("client_id", OauthConstants.NAVER_CLIENT_ID);
+        tokenRequestBody.add("client_secret", OauthConstants.NAVER_CLIENT_SECRET);
+        tokenRequestBody.add("redirect_uri", OauthConstants.NAVER_REDIRECT_URI);
         tokenRequestBody.add("code", code);
 
         // 1-3. body + header 객체 만들기
@@ -218,7 +208,7 @@ public class UserService {
 
         // 1-4. api 요청하기 (토큰 받기)
         ResponseEntity<UserResponse.NaverTokenDTO> token = restTemplate.exchange(
-                NAVER_TOKEN_REQUEST_URL,
+                OauthConstants.NAVER_TOKEN_REQUEST_URL,
                 HttpMethod.POST,
                 tokenRequest,
                 UserResponse.NaverTokenDTO.class);
@@ -231,7 +221,7 @@ public class UserService {
         HttpEntity<MultiValueMap<String, String>> userInfoRequest = new HttpEntity<>(userInfoRequestHeaders);
 
         ResponseEntity<UserResponse.NaverUserDTO> userInfoResponse = restTemplate.exchange(
-                NAVER_USER_INFO_URL,
+                OauthConstants.NAVER_USER_INFO_URL,
                 HttpMethod.GET,
                 userInfoRequest,
                 UserResponse.NaverUserDTO.class);
