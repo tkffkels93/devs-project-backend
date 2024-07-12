@@ -15,8 +15,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
         System.out.println("인터셉터 등록됨============================================================");
         registry.addInterceptor(new LoginInterceptor())
                 .addPathPatterns("/api/**")
-                .addPathPatterns("/admin/**")
+//                .addPathPatterns("/admin/**")
                 .excludePathPatterns("")
+                .excludePathPatterns("/admin/**")
                 .excludePathPatterns("/api/users/login")
                 .excludePathPatterns("/api/users/join")
                 .excludePathPatterns("/api/users/oauth/kakao")
