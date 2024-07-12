@@ -33,7 +33,7 @@ public class UserService {
     @Transactional
     public User adminLogin(UserRequest.AdminLoginDTO adminLoginDTO) {
         User user = userRepository.findByEmailAndUserRole(adminLoginDTO.getEmail(), UserRole.ADMIN)
-                .orElseThrow(() -> new Exception400("존재하지 않는 관리자입니다."));
+                .orElseThrow(() -> new Exception404("존재하지 않는 관리자입니다."));
 
         if (!user.getPassword().equals(adminLoginDTO.getPassword())) {
             throw new Exception400("비밀번호가 일치하지 않습니다.");
@@ -67,7 +67,7 @@ public class UserService {
         ).orElseThrow(() -> new Exception403("관리자만 접근할 수 있습니다."));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new Exception400("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new Exception404("존재하지 않는 회원입니다."));
 
         return new UserResponse.DetailDTO(user);
     }
@@ -82,7 +82,7 @@ public class UserService {
         ).orElseThrow(() -> new Exception403("관리자만 접근할 수 있습니다."));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new Exception400("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new Exception404("존재하지 않는 회원입니다."));
 
         if (user.getStatus() == UserStatus.DELETED) {
             throw new Exception400("이미 삭제된 회원입니다.");
@@ -102,7 +102,7 @@ public class UserService {
         ).orElseThrow(() -> new Exception403("관리자만 접근할 수 있습니다."));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new Exception400("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new Exception404("존재하지 않는 회원입니다."));
 
         if (user.getStatus() == UserStatus.BLOCKED) {
             throw new Exception400("이미 차단된 회원입니다.");
