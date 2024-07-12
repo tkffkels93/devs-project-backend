@@ -6,13 +6,14 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.List;
 
 public class UserResponse {
 
-    // 토큰 DTO
+    // 카카오 토큰 DTO
     @Data
-    public static class TokenDTO {
+    public static class KakaoTokenDTO {
         @JsonProperty("access_token")
         private String accessToken;
         @JsonProperty("token_type")
@@ -42,4 +43,39 @@ public class UserResponse {
             private String profileImage;
         }
     }
+
+    // 네이버 토큰 DTO
+    @Data
+    public static class NaverTokenDTO {
+        @JsonProperty("access_token")
+        private String accessToken;
+        @JsonProperty("refresh_token")
+        private String refreshToken;
+        @JsonProperty("token_type")
+        private String tokenType;
+        @JsonProperty("expires_in")
+        private Integer expiresIn;
+    }
+
+    // 네이버 유저 DTO
+    @Data
+    public static class NaverUserDTO {
+        private Response response;
+
+        @Data
+        class Response {
+            private String id;
+            private String nickname;
+            @JsonProperty("profile_image")
+            private String profileImage;
+            private String email;
+            private String mobile;
+            @JsonProperty("mobile_e164")
+            private String mobileE164; // 국제 전화
+            private String name;
+            private String birthday;
+            private String birthyear;
+        }
+    }
+
 }

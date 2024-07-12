@@ -23,6 +23,14 @@ public class UserRestController {
         return ResponseEntity.ok().header(JwtVO.HEADER, JwtVO.PREFIX + jwt).body(new ApiUtil<>(null));
     }
 
+    // https://nid.naver.com/oauth2.0/authorize?redirect_uri=http://localhost:8080/api/users/oauth/naver&response_type=code&client_id=nfdBh7_HSSjdAvaBPLWs
+    // 네이버 로그인
+    @GetMapping("/oauth/naver")
+    public  ResponseEntity<?> naverLogin(String code){
+        String jwt = userService.naverLogin(code);
+        return ResponseEntity.ok().header(JwtVO.HEADER, JwtVO.PREFIX + jwt).body(new ApiUtil<>(null));
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(UserRequest.LoginDTO loginDTO){
         String jwt = userService.login(loginDTO);
