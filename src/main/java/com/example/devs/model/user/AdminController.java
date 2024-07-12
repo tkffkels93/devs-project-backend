@@ -1,6 +1,7 @@
 package com.example.devs.model.user;
 
 import com.example.devs._core.utils.ApiUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,13 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
     private final UserService userService;
     private final HttpSession session;
+
+    // test
+    @GetMapping("/test")
+    public @ResponseBody String test(HttpServletRequest request) {
+        System.out.println("test");
+        return "test";
+    }
 
     // 로그인
     @PostMapping("/login")

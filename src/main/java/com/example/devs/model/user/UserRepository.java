@@ -18,4 +18,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     // 회원 정보 리스트 찾기
     @Query("select u from User u where u.role = :role and u.status in :status order by u.id desc")
     List<User> findByRoleAndStatusIn(@Param("role") UserRole role, @Param("status") List<UserStatus> status);
+
+    @Query("select u from User u where u.email = :email")
+    User findByEmailV2(String email);
+
+    @Query("select u from User u where u.email = :email and u.provider = 'EMAIL'")
+    Optional<User> findByEmail(String email);
 }

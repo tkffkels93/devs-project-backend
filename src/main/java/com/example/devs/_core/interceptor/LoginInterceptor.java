@@ -20,6 +20,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // jwt 토큰
         String jwt = request.getHeader("Authorization");
+        System.out.println("============preHandle");
 
         // interceptor 에서 안하면 throw 날리기가 힘들다!
         // 토큰 전달 검사
