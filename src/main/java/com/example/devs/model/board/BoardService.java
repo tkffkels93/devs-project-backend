@@ -1,5 +1,6 @@
 package com.example.devs.model.board;
 
+import jakarta.transaction.Transactional;
 import com.example.devs._core.enums.BoardRole;
 import com.example.devs._core.enums.BoardStatus;
 import com.example.devs._core.errors.exception.Exception400;
@@ -8,8 +9,11 @@ import com.example.devs._core.errors.exception.Exception403;
 import com.example.devs._core.errors.exception.Exception404;
 import com.example.devs.model.user.User;
 import com.example.devs.model.user.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +24,15 @@ import java.util.Optional;
 public class BoardService {
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
+
+    @Transactional
+    public Page<BoardResponse.ListDTO> getBoards(int page, int size){
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Board> boards =  boardRepository.findAll(pageable);
+        return boards.map(BoardResponse.ListDTO::new);
+    }
+
 
     // 게시글 리스트 (관리자)
     public BoardResponse.BoardListDTO getBoardList(User sessionAdmin) {
