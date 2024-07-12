@@ -2,19 +2,26 @@ package com.example.devs.model.user;
 
 import com.example.devs._core.enums.UserProvider;
 import com.example.devs._core.enums.UserRole;
-import com.example.devs._core.enums.UserStatus;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.Data;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class UserRequest {
+
+    // 관리자 로그인 DTO
     @Data
-    public static class LoginDTO{
+    public static class AdminLoginDTO {
+        private String email;
+        private String password;
+
+        public AdminLoginDTO(String email, String password) {
+            this.email = email;
+            this.password = password;
+        }
+    }
+
+    @Data
+    public static class LoginDTO {
         private String email;
         private String password;
     }
