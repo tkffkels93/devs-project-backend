@@ -37,6 +37,10 @@ public class User {
 
     private String image; // 프로필 사진
 
+    private String position; // 직함
+
+    private String introduce; //자기소개
+
     @Enumerated(EnumType.STRING)
     private UserRole role; // 권한
 
@@ -55,7 +59,7 @@ public class User {
     private LocalDateTime updatedAt; // 수정일
 
     @Builder
-    public User(Integer id, String email, String password, String nickname, String username, String phone, LocalDate birth, String image, UserRole role, String providerId, UserProvider provider, UserStatus status, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public User(Integer id, String email, String password, String nickname, String username, String phone, LocalDate birth, String image, String position, String introduce, UserRole role, String providerId, UserProvider provider, UserStatus status, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -64,6 +68,8 @@ public class User {
         this.phone = phone;
         this.birth = birth;
         this.image = image;
+        this.position = position;
+        this.introduce = introduce;
         this.role = role;
         this.providerId = providerId;
         this.provider = provider;

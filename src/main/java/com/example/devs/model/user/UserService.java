@@ -291,6 +291,8 @@ public class UserService {
                 .phone(joinDTO.getPhone())
                 .birth(bod)
                 .image(null)
+                .introduce(joinDTO.getIntroduce())
+                .position(joinDTO.getPosition())
                 .role(UserRole.USER)
                 .provider(UserProvider.EMAIL).build();
 
