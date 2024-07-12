@@ -51,6 +51,7 @@ public class MyApiExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> unknownServerError(Exception e, HttpServletRequest request) {
         request.setAttribute("msg", e.getMessage());
+        e.printStackTrace();
         log.error("500 : " + e.getMessage());
         ApiUtil.ApiResult<?> apiResult = ApiUtil.error("unknown server error", HttpStatus.INTERNAL_SERVER_ERROR);
         return new ResponseEntity<>(apiResult, HttpStatus.INTERNAL_SERVER_ERROR);
