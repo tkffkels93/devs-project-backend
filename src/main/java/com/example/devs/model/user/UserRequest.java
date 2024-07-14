@@ -37,6 +37,8 @@ public class UserRequest {
         private String month;
         private String day;
         private String image;
+        private String position;
+        private String introduce;
         private LocalDate birthdate;
         private UserRole role = UserRole.USER;
         private UserProvider provider = UserProvider.EMAIL;
