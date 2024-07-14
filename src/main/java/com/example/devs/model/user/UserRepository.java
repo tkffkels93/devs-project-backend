@@ -1,5 +1,6 @@
 package com.example.devs.model.user;
 
+import com.example.devs._core.enums.UserProvider;
 import com.example.devs._core.enums.UserRole;
 import com.example.devs._core.enums.UserStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,4 +25,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query("select u from User u where u.email = :email and u.provider = 'EMAIL'")
     Optional<User> findByEmail(String email);
+
+    @Query("select u from User u where u.email = :email and u.provider = :provider")
+    Optional<User> findByEmailV3(@Param("email") String email, @Param("provider") UserProvider provider);
 }

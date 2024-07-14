@@ -19,7 +19,7 @@ public class UserRestController {
     // 카카오 로그인
     @GetMapping("/oauth/kakao")
     public ResponseEntity<?> kakaoLogin(String code){
-        String jwt = userService.kakaoLogin(code);
+        String jwt = userService.kakaoLoginV2(code);
         return ResponseEntity.ok()
                 .header(JwtVO.HEADER, JwtVO.PREFIX + jwt)
                 .body(new ApiUtil<>(null));
@@ -29,7 +29,7 @@ public class UserRestController {
     // 네이버 로그인
     @GetMapping("/oauth/naver")
     public  ResponseEntity<?> naverLogin(String code){
-        String jwt = userService.naverLogin(code);
+        String jwt = userService.naverLoginV2(code);
         return ResponseEntity.ok()
                 .header(JwtVO.HEADER, JwtVO.PREFIX + jwt)
                 .body(new ApiUtil<>(null));
@@ -38,7 +38,9 @@ public class UserRestController {
     @PostMapping("/login")
     public ResponseEntity<?> login(UserRequest.LoginDTO loginDTO){
         String jwt = userService.login(loginDTO);
-        return ResponseEntity.ok().header(JwtVO.HEADER, JwtVO.PREFIX+ jwt).body(new ApiUtil<>(null)); // header 문법
+        return ResponseEntity.ok()
+                .header(JwtVO.HEADER, JwtVO.PREFIX+ jwt)
+                .body(new ApiUtil<>(null)); // header 문법
     }
 
     @PostMapping("/join")

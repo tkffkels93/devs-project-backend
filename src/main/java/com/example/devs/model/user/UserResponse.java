@@ -6,6 +6,7 @@ import com.example.devs._core.utils.LocalDateTimeFormatter;
 import com.example.devs._core.utils.ScopeConverter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.Builder;
 import lombok.Data;
 
 import java.sql.Timestamp;
@@ -93,6 +94,41 @@ public class UserResponse {
             this.updatedAt = Optional.ofNullable(user.getUpdatedAt())
                     .map(LocalDateTimeFormatter::convert)
                     .orElse("N/A");
+        }
+    }
+
+    // 공통 OAuth 토큰 정보 DTO
+    @Data
+    public static class OAuthTokenDTO {
+        @JsonProperty("access_token")
+        private String accessToken;
+        @JsonProperty("token_type")
+        private String tokenType;
+        @JsonProperty("refresh_token")
+        private String refreshToken;
+        @JsonProperty("expires_in")
+        private Integer expiresIn;
+    }
+
+    // 카카오 전용 추가 토큰 정보 DTO
+    @Data
+    public static class KakaoTokenDTOV2 extends OAuthTokenDTO {
+        @JsonDeserialize(using = ScopeConverter.class)
+        private List<String> scope;
+        @JsonProperty("refresh_token_expires_in")
+        private Integer refreshTokenExpiresIn;
+    }
+
+    // 유저 로그인 DTO
+    @Builder
+    @Data
+    public static class OAuthUserDTO {
+        private Integer id;
+        private String email;
+
+        public OAuthUserDTO(Integer id, String email) {
+            this.id = id;
+            this.email = email;
         }
     }
 

@@ -28,6 +28,7 @@ import java.util.Optional;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final List<OAuthLoginService> oAuthLoginServices;
 
     // 로그인 (관리자)
     @Transactional
@@ -119,7 +120,7 @@ public class UserService {
 
         // 1-1. http header 설정
         HttpHeaders tokenRequestHeaders = new HttpHeaders();
-        tokenRequestHeaders.add(HttpHeadersConstants.CONTENT_TYPE, HttpHeadersConstants.CONTENT_TYPE_FORM_URLENCODED_UTF8);
+        tokenRequestHeaders.add(OauthConstants.CONTENT_TYPE, OauthConstants.CONTENT_TYPE_FORM_URLENCODED_UTF8);
 
         // 1-2. http body 설정
         MultiValueMap<String, String> tokenRequestBody = new LinkedMultiValueMap<>();
@@ -140,7 +141,7 @@ public class UserService {
 
         // 2. 토큰으로 사용자 정보 받기
         HttpHeaders userInfoRequestHeaders = new HttpHeaders();
-        userInfoRequestHeaders.add(HttpHeadersConstants.CONTENT_TYPE, HttpHeadersConstants.CONTENT_TYPE_FORM_URLENCODED_UTF8);
+        userInfoRequestHeaders.add(OauthConstants.CONTENT_TYPE, OauthConstants.CONTENT_TYPE_FORM_URLENCODED_UTF8);
         userInfoRequestHeaders.add(JwtVO.HEADER, JwtVO.PREFIX + token.getBody().getAccessToken());
 
         HttpEntity<MultiValueMap<String, String>> userInfoRequest = new HttpEntity<>(userInfoRequestHeaders);
@@ -177,7 +178,6 @@ public class UserService {
                     .birth(LocalDate.now())
                     .image(userInfoResponse.getBody().getProperties().getProfileImage())
                     .role(UserRole.USER)
-                    // .providerId("프로바이더 고유 번호가 뭐죠?")
                     .provider(UserProvider.KAKAO)
                     .status(UserStatus.ACTIVE)
                     .build();
@@ -193,7 +193,7 @@ public class UserService {
 
         // 1-1. http header 설정
         HttpHeaders tokenRequestHeaders = new HttpHeaders();
-        tokenRequestHeaders.add(HttpHeadersConstants.CONTENT_TYPE, HttpHeadersConstants.CONTENT_TYPE_FORM_URLENCODED_UTF8);
+        tokenRequestHeaders.add(OauthConstants.CONTENT_TYPE, OauthConstants.CONTENT_TYPE_FORM_URLENCODED_UTF8);
 
         // 1-2. http body 설정
         MultiValueMap<String, String> tokenRequestBody = new LinkedMultiValueMap<>();
@@ -215,7 +215,7 @@ public class UserService {
 
         // 2. 토큰으로 사용자 정보 받기
         HttpHeaders userInfoRequestHeaders = new HttpHeaders();
-        userInfoRequestHeaders.add(HttpHeadersConstants.CONTENT_TYPE, HttpHeadersConstants.CONTENT_TYPE_FORM_URLENCODED_UTF8);
+        userInfoRequestHeaders.add(OauthConstants.CONTENT_TYPE, OauthConstants.CONTENT_TYPE_FORM_URLENCODED_UTF8);
         userInfoRequestHeaders.add(JwtVO.HEADER, JwtVO.PREFIX + token.getBody().getAccessToken());
 
         HttpEntity<MultiValueMap<String, String>> userInfoRequest = new HttpEntity<>(userInfoRequestHeaders);
@@ -245,7 +245,6 @@ public class UserService {
                     .birth(LocalDateTimeFormatter.parseBirth(userInfoResponse.getBody().getResponse().getBirthyear(), userInfoResponse.getBody().getResponse().getBirthday()))
                     .image(userInfoResponse.getBody().getResponse().getProfileImage())
                     .role(UserRole.USER)
-                    // .providerId("프로바이더 고유 번호가 뭐죠?")
                     .provider(UserProvider.NAVER)
                     .status(UserStatus.ACTIVE)
                     .build();
@@ -288,5 +287,75 @@ public class UserService {
 
         user = userRepository.save(user);
         return user;
+    }
+
+    //////////////////////////////////////////////////////////
+
+    private OAuthLoginService getOAuthService(UserProvider provider) {
+        return oAuthLoginServices.stream()
+                .filter(service -> service.getProvider() == provider)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 OAuth 공급자입니다."));
+    }
+
+    public String kakaoLoginV2(String code) {
+        OAuthLoginService kakaoService = getOAuthService(UserProvider.KAKAO);
+        UserResponse.OAuthTokenDTO tokenDTO = kakaoService.getAccessToken(code);
+        UserResponse.KakaoUserDTO userDTO = (UserResponse.KakaoUserDTO) kakaoService.getUserInfo(tokenDTO.getAccessToken());
+
+        // 이메일로 사용자 조회 - 카카오는 이메일 안줌 ..
+        String email = UserProvider.KAKAO.name() + userDTO.getId() + "@kakao.com";
+        Optional<User> loginUser = userRepository.findByEmailV3(email, UserProvider.KAKAO);
+
+        // 계정이 가입된 경우
+        if (loginUser.isPresent()) {
+            return JwtUtil.userCreate(loginUser.get());
+        }else {
+            // 계정이 가입되지 않은 경우
+            User joinUser = User.builder()
+                    .email(email)
+                    .nickname(userDTO.getProperties().getNickname())
+                    .username(userDTO.getProperties().getNickname())
+                    .phone("010-1234-5678")
+                    .birth(LocalDate.now())
+                    .image(userDTO.getProperties().getProfileImage())
+                    .role(UserRole.USER)
+                    .provider(UserProvider.KAKAO)
+                    .status(UserStatus.ACTIVE)
+                    .build();
+            userRepository.save(joinUser);
+            return JwtUtil.userCreate(joinUser);
+        }
+
+    }
+
+    public String naverLoginV2(String code) {
+        OAuthLoginService<UserResponse.NaverUserDTO> naverService = getOAuthService(UserProvider.NAVER);
+        UserResponse.OAuthTokenDTO tokenDTO = naverService.getAccessToken(code);
+        UserResponse.NaverUserDTO userDTO = naverService.getUserInfo(tokenDTO.getAccessToken());
+
+        // 이메일로 사용자 조회
+        String email = userDTO.getResponse().getEmail();
+        Optional<User> loginUser = userRepository.findByEmailV3(email, UserProvider.NAVER);
+
+        // 계정이 가입된 경우
+        if (loginUser.isPresent()) {
+            return JwtUtil.userCreate(loginUser.get());
+        } else {
+            // 계정이 가입되지 않은 경우
+            User joinUser = User.builder()
+                    .email(email)
+                    .nickname(userDTO.getResponse().getNickname())
+                    .username(userDTO.getResponse().getName())
+                    .phone(userDTO.getResponse().getMobile())
+                    .birth(LocalDateTimeFormatter.parseBirth(userDTO.getResponse().getBirthyear(), userDTO.getResponse().getBirthday()))
+                    .image(userDTO.getResponse().getProfileImage())
+                    .role(UserRole.USER)
+                    .provider(UserProvider.NAVER)
+                    .status(UserStatus.ACTIVE)
+                    .build();
+            userRepository.save(joinUser);
+            return JwtUtil.userCreate(joinUser);
+        }
     }
 }
