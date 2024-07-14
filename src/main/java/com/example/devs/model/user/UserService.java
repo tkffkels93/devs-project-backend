@@ -291,15 +291,90 @@ public class UserService {
 
     //////////////////////////////////////////////////////////
 
-    private OAuthLoginService getOAuthService(UserProvider provider) {
+    // OAuth 공급자에 해당하는 서비스를 반환
+    private OAuthLoginService getOAuthProvider(UserProvider provider) {
         return oAuthLoginServices.stream()
                 .filter(service -> service.getProvider() == provider)
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 OAuth 공급자입니다."));
+                .orElseThrow(() -> new Exception404("지원하지 않는 OAuth 공급자입니다."));
+    }
+
+    public String getOAuthUserInfo(UserProvider provider, String code) {
+        OAuthLoginService<?> loginService = getOAuthProvider(provider);
+        UserResponse.OAuthTokenDTO tokenDTO = loginService.getAccessToken(code);
+
+        if (provider == UserProvider.KAKAO) {
+            UserResponse.KakaoUserDTO userDTO = (UserResponse.KakaoUserDTO) loginService.getUserInfo(tokenDTO.getAccessToken());
+            return OAuthLogin(userDTO, provider);
+        } else if (provider == UserProvider.NAVER) {
+            UserResponse.NaverUserDTO userDTO = (UserResponse.NaverUserDTO) loginService.getUserInfo(tokenDTO.getAccessToken());
+            return OAuthLogin(userDTO, provider);
+        } else {
+            throw new Exception404("지원하지 않는 OAuth 공급자입니다.");
+        }
+    }
+
+    private <T> String OAuthLogin(T userDTO, UserProvider provider) {
+        String email;
+
+        // 이메일 설정
+        if (provider == UserProvider.KAKAO) {
+            UserResponse.KakaoUserDTO kakaoUserDTO = (UserResponse.KakaoUserDTO) userDTO;
+            email = UserProvider.KAKAO.name() + kakaoUserDTO.getId() + "@kakao.com";
+        } else if (provider == UserProvider.NAVER) {
+            UserResponse.NaverUserDTO naverUserDTO = (UserResponse.NaverUserDTO) userDTO;
+            email = naverUserDTO.getResponse().getEmail();
+        } else {
+            throw new Exception404("지원하지 않는 OAuth 공급자입니다.");
+        }
+
+        Optional<User> loginUser = userRepository.findByEmailV3(email, provider);
+
+        if (loginUser.isPresent()) {
+            // 사용자 존재 시 JWT 생성 및 반환
+            return JwtUtil.userCreate(loginUser.get());
+        } else {
+            // 사용자 없을 시 추가 정보 설정 및 새 사용자 생성
+            String nickname;
+            String username;
+            String phone;
+            LocalDate birth;
+            String profileImage;
+
+            if (provider == UserProvider.KAKAO) {
+                UserResponse.KakaoUserDTO kakaoUser = (UserResponse.KakaoUserDTO) userDTO;
+                nickname = kakaoUser.getProperties().getNickname();
+                username = kakaoUser.getProperties().getNickname();
+                phone = "010-1234-5678"; // 임의로 설정
+                birth = LocalDate.now(); // 임의로 설정
+                profileImage = kakaoUser.getProperties().getProfileImage();
+            } else {
+                UserResponse.NaverUserDTO naverUser = (UserResponse.NaverUserDTO) userDTO;
+                nickname = naverUser.getResponse().getNickname();
+                username = naverUser.getResponse().getName();
+                phone = naverUser.getResponse().getMobile();
+                birth = LocalDateTimeFormatter.parseBirth(naverUser.getResponse().getBirthyear(), naverUser.getResponse().getBirthday());
+                profileImage = naverUser.getResponse().getProfileImage();
+            }
+
+            User joinUser = User.builder()
+                    .email(email)
+                    .nickname(nickname)
+                    .username(username)
+                    .phone(phone)
+                    .birth(birth)
+                    .image(profileImage)
+                    .role(UserRole.USER)
+                    .provider(provider)
+                    .status(UserStatus.ACTIVE)
+                    .build();
+            userRepository.save(joinUser);
+            return JwtUtil.userCreate(joinUser);
+        }
     }
 
     public String kakaoLoginV2(String code) {
-        OAuthLoginService kakaoService = getOAuthService(UserProvider.KAKAO);
+        OAuthLoginService kakaoService = getOAuthProvider(UserProvider.KAKAO);
         UserResponse.OAuthTokenDTO tokenDTO = kakaoService.getAccessToken(code);
         UserResponse.KakaoUserDTO userDTO = (UserResponse.KakaoUserDTO) kakaoService.getUserInfo(tokenDTO.getAccessToken());
 
@@ -330,7 +405,7 @@ public class UserService {
     }
 
     public String naverLoginV2(String code) {
-        OAuthLoginService<UserResponse.NaverUserDTO> naverService = getOAuthService(UserProvider.NAVER);
+        OAuthLoginService<UserResponse.NaverUserDTO> naverService = getOAuthProvider(UserProvider.NAVER);
         UserResponse.OAuthTokenDTO tokenDTO = naverService.getAccessToken(code);
         UserResponse.NaverUserDTO userDTO = naverService.getUserInfo(tokenDTO.getAccessToken());
 
