@@ -7,17 +7,12 @@ import com.example.devs._core.errors.exception.Exception400;
 import com.example.devs._core.errors.exception.Exception401;
 import com.example.devs._core.errors.exception.Exception403;
 import com.example.devs._core.errors.exception.Exception404;
-import com.example.devs._core.utils.*;
+import com.example.devs._core.utils.EncryptUtil;
+import com.example.devs._core.utils.JwtUtil;
+import com.example.devs._core.utils.LocalDateTimeFormatter;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -113,146 +108,6 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // 카카오 로그인
-    public String kakaoLogin(String code) {
-        // 1. RestTemplate 설정
-        RestTemplate restTemplate = new RestTemplate();
-
-        // 1-1. http header 설정
-        HttpHeaders tokenRequestHeaders = new HttpHeaders();
-        tokenRequestHeaders.add(OauthConstants.CONTENT_TYPE, OauthConstants.CONTENT_TYPE_FORM_URLENCODED_UTF8);
-
-        // 1-2. http body 설정
-        MultiValueMap<String, String> tokenRequestBody = new LinkedMultiValueMap<>();
-        tokenRequestBody.add("grant_type", OauthConstants.GRANT_TYPE);
-        tokenRequestBody.add("client_id", OauthConstants.KAKAO_CLIENT_ID);
-        tokenRequestBody.add("redirect_uri", OauthConstants.KAKAO_REDIRECT_URI);
-        tokenRequestBody.add("code", code);
-
-        // 1-3. body + header 객체 만들기
-        HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(tokenRequestBody, tokenRequestHeaders);
-
-        // 1-4. api 요청하기 (토큰 받기)
-        ResponseEntity<UserResponse.KakaoTokenDTO> token = restTemplate.exchange(
-                OauthConstants.KAKAO_TOKEN_REQUEST_URL,
-                HttpMethod.POST,
-                tokenRequest,
-                UserResponse.KakaoTokenDTO.class);
-
-        // 2. 토큰으로 사용자 정보 받기
-        HttpHeaders userInfoRequestHeaders = new HttpHeaders();
-        userInfoRequestHeaders.add(OauthConstants.CONTENT_TYPE, OauthConstants.CONTENT_TYPE_FORM_URLENCODED_UTF8);
-        userInfoRequestHeaders.add(JwtVO.HEADER, JwtVO.PREFIX + token.getBody().getAccessToken());
-
-        HttpEntity<MultiValueMap<String, String>> userInfoRequest = new HttpEntity<>(userInfoRequestHeaders);
-
-        ResponseEntity<UserResponse.KakaoUserDTO> userInfoResponse = restTemplate.exchange(
-                OauthConstants.KAKAO_USER_INFO_URL,
-                HttpMethod.GET,
-                userInfoRequest,
-                UserResponse.KakaoUserDTO.class);
-
-        // 3. 해당정보로 DB조회 (회원인 경우, 회원이 아닌 경우)
-        // FIXME: 메일이 안받아져서 KAKAO + PK + 하드코딩된 이메일 생성
-        String email = UserProvider.KAKAO.name() + userInfoResponse.getBody().getId() + "@kakao.com";
-        // FIXME: 카카오 정보가 제한적이라 유니크한 값을 어떤 것으로 지정해야 할지 모르겠음
-        User loginUser = userRepository.findByEmailV2(email);
-
-        // 4. 회원인 경우 회원이 아닌 경우 판별
-        if (loginUser != null) {
-            // 회원인 경우
-            System.out.println("########## 회원인 경우 ##########");
-            return JwtUtil.userCreate(loginUser);
-        } else {
-            // 회원이 아닌 경우: 가입 후 로그인
-            System.out.println("########## 회원이 아닌 경우 ##########");
-            User user = User.builder()
-                    // FIXME: 메일이 안받아져요.
-                    .email(email)
-                    .nickname(userInfoResponse.getBody().getProperties().getNickname())
-                    // FIXME: 이름이 안받아져요.
-                    .username("김덕배")
-                    // FIXME: 번호가 안받아져요.
-                    .phone("010-1234-5678")
-                    // FIXME: 생일이 안받아져요.
-                    .birth(LocalDate.now())
-                    .image(userInfoResponse.getBody().getProperties().getProfileImage())
-                    .role(UserRole.USER)
-                    .provider(UserProvider.KAKAO)
-                    .status(UserStatus.ACTIVE)
-                    .build();
-            User joinUser = userRepository.save(user);
-            return JwtUtil.userCreate(joinUser);
-        }
-    }
-
-    // 네이버 로그인
-    public String naverLogin(String code) {
-        // 1. RestTemplate 설정
-        RestTemplate restTemplate = new RestTemplate();
-
-        // 1-1. http header 설정
-        HttpHeaders tokenRequestHeaders = new HttpHeaders();
-        tokenRequestHeaders.add(OauthConstants.CONTENT_TYPE, OauthConstants.CONTENT_TYPE_FORM_URLENCODED_UTF8);
-
-        // 1-2. http body 설정
-        MultiValueMap<String, String> tokenRequestBody = new LinkedMultiValueMap<>();
-        tokenRequestBody.add("grant_type", OauthConstants.GRANT_TYPE);
-        tokenRequestBody.add("client_id", OauthConstants.NAVER_CLIENT_ID);
-        tokenRequestBody.add("client_secret", OauthConstants.NAVER_CLIENT_SECRET);
-        tokenRequestBody.add("redirect_uri", OauthConstants.NAVER_REDIRECT_URI);
-        tokenRequestBody.add("code", code);
-
-        // 1-3. body + header 객체 만들기
-        HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(tokenRequestBody, tokenRequestHeaders);
-
-        // 1-4. api 요청하기 (토큰 받기)
-        ResponseEntity<UserResponse.NaverTokenDTO> token = restTemplate.exchange(
-                OauthConstants.NAVER_TOKEN_REQUEST_URL,
-                HttpMethod.POST,
-                tokenRequest,
-                UserResponse.NaverTokenDTO.class);
-
-        // 2. 토큰으로 사용자 정보 받기
-        HttpHeaders userInfoRequestHeaders = new HttpHeaders();
-        userInfoRequestHeaders.add(OauthConstants.CONTENT_TYPE, OauthConstants.CONTENT_TYPE_FORM_URLENCODED_UTF8);
-        userInfoRequestHeaders.add(JwtVO.HEADER, JwtVO.PREFIX + token.getBody().getAccessToken());
-
-        HttpEntity<MultiValueMap<String, String>> userInfoRequest = new HttpEntity<>(userInfoRequestHeaders);
-
-        ResponseEntity<UserResponse.NaverUserDTO> userInfoResponse = restTemplate.exchange(
-                OauthConstants.NAVER_USER_INFO_URL,
-                HttpMethod.GET,
-                userInfoRequest,
-                UserResponse.NaverUserDTO.class);
-
-        // 3. 해당정보로 DB조회 (회원인 경우, 회원이 아닌 경우)
-        User loginUser = userRepository.findByEmailV2(userInfoResponse.getBody().getResponse().getEmail());
-
-        // 4. 회원인 경우 회원이 아닌 경우 판별
-        if (loginUser != null) {
-            // 회원인 경우
-            System.out.println("########## 회원인 경우 ##########");
-            return JwtUtil.userCreate(loginUser);
-        } else {
-            // 회원이 아닌 경우: 가입 후 로그인
-            System.out.println("########## 회원이 아닌 경우 ##########");
-            User user = User.builder()
-                    .email(userInfoResponse.getBody().getResponse().getEmail())
-                    .nickname(userInfoResponse.getBody().getResponse().getNickname())
-                    .username(userInfoResponse.getBody().getResponse().getName())
-                    .phone(userInfoResponse.getBody().getResponse().getMobile())
-                    .birth(LocalDateTimeFormatter.parseBirth(userInfoResponse.getBody().getResponse().getBirthyear(), userInfoResponse.getBody().getResponse().getBirthday()))
-                    .image(userInfoResponse.getBody().getResponse().getProfileImage())
-                    .role(UserRole.USER)
-                    .provider(UserProvider.NAVER)
-                    .status(UserStatus.ACTIVE)
-                    .build();
-            User joinUser = userRepository.save(user);
-            return JwtUtil.userCreate(joinUser);
-        }
-    }
-
     public String login(UserRequest.LoginDTO loginDTO) {
         String msg = "아이디 혹은 비밀번호가 잘못되었습니다.";
         System.out.println(loginDTO.getEmail());
@@ -289,7 +144,21 @@ public class UserService {
         return user;
     }
 
-    //////////////////////////////////////////////////////////
+    // OAuth 로그인
+    public String oauthLogin(UserProvider provider, String code) {
+        OAuthLoginService<?> loginService = getOAuthProvider(provider);
+        UserResponse.OAuthTokenDTO tokenDTO = loginService.getAccessToken(code);
+
+        if (provider == UserProvider.KAKAO) {
+            UserResponse.KakaoUserDTO userDTO = (UserResponse.KakaoUserDTO) loginService.getUserInfo(tokenDTO.getAccessToken());
+            return findOrSaveUser(userDTO, provider);
+        } else if (provider == UserProvider.NAVER) {
+            UserResponse.NaverUserDTO userDTO = (UserResponse.NaverUserDTO) loginService.getUserInfo(tokenDTO.getAccessToken());
+            return findOrSaveUser(userDTO, provider);
+        } else {
+            throw new Exception404("지원하지 않는 OAuth 공급자입니다.");
+        }
+    }
 
     // OAuth 공급자에 해당하는 서비스를 반환
     private OAuthLoginService getOAuthProvider(UserProvider provider) {
@@ -299,22 +168,8 @@ public class UserService {
                 .orElseThrow(() -> new Exception404("지원하지 않는 OAuth 공급자입니다."));
     }
 
-    public String getOAuthUserInfo(UserProvider provider, String code) {
-        OAuthLoginService<?> loginService = getOAuthProvider(provider);
-        UserResponse.OAuthTokenDTO tokenDTO = loginService.getAccessToken(code);
-
-        if (provider == UserProvider.KAKAO) {
-            UserResponse.KakaoUserDTO userDTO = (UserResponse.KakaoUserDTO) loginService.getUserInfo(tokenDTO.getAccessToken());
-            return OAuthLogin(userDTO, provider);
-        } else if (provider == UserProvider.NAVER) {
-            UserResponse.NaverUserDTO userDTO = (UserResponse.NaverUserDTO) loginService.getUserInfo(tokenDTO.getAccessToken());
-            return OAuthLogin(userDTO, provider);
-        } else {
-            throw new Exception404("지원하지 않는 OAuth 공급자입니다.");
-        }
-    }
-
-    private <T> String OAuthLogin(T userDTO, UserProvider provider) {
+    // OAuth 사용자 정보를 확인하고, 없으면 새로 생성하여 JWT 토큰 반환
+    private <T> String findOrSaveUser(T userDTO, UserProvider provider) {
         String email;
 
         // 이메일 설정
@@ -328,7 +183,7 @@ public class UserService {
             throw new Exception404("지원하지 않는 OAuth 공급자입니다.");
         }
 
-        Optional<User> loginUser = userRepository.findByEmailV3(email, provider);
+        Optional<User> loginUser = userRepository.findByEmailAndProvider(email, provider);
 
         if (loginUser.isPresent()) {
             // 사용자 존재 시 JWT 생성 및 반환
@@ -366,67 +221,6 @@ public class UserService {
                     .image(profileImage)
                     .role(UserRole.USER)
                     .provider(provider)
-                    .status(UserStatus.ACTIVE)
-                    .build();
-            userRepository.save(joinUser);
-            return JwtUtil.userCreate(joinUser);
-        }
-    }
-
-    public String kakaoLoginV2(String code) {
-        OAuthLoginService kakaoService = getOAuthProvider(UserProvider.KAKAO);
-        UserResponse.OAuthTokenDTO tokenDTO = kakaoService.getAccessToken(code);
-        UserResponse.KakaoUserDTO userDTO = (UserResponse.KakaoUserDTO) kakaoService.getUserInfo(tokenDTO.getAccessToken());
-
-        // 이메일로 사용자 조회 - 카카오는 이메일 안줌 ..
-        String email = UserProvider.KAKAO.name() + userDTO.getId() + "@kakao.com";
-        Optional<User> loginUser = userRepository.findByEmailV3(email, UserProvider.KAKAO);
-
-        // 계정이 가입된 경우
-        if (loginUser.isPresent()) {
-            return JwtUtil.userCreate(loginUser.get());
-        }else {
-            // 계정이 가입되지 않은 경우
-            User joinUser = User.builder()
-                    .email(email)
-                    .nickname(userDTO.getProperties().getNickname())
-                    .username(userDTO.getProperties().getNickname())
-                    .phone("010-1234-5678")
-                    .birth(LocalDate.now())
-                    .image(userDTO.getProperties().getProfileImage())
-                    .role(UserRole.USER)
-                    .provider(UserProvider.KAKAO)
-                    .status(UserStatus.ACTIVE)
-                    .build();
-            userRepository.save(joinUser);
-            return JwtUtil.userCreate(joinUser);
-        }
-
-    }
-
-    public String naverLoginV2(String code) {
-        OAuthLoginService<UserResponse.NaverUserDTO> naverService = getOAuthProvider(UserProvider.NAVER);
-        UserResponse.OAuthTokenDTO tokenDTO = naverService.getAccessToken(code);
-        UserResponse.NaverUserDTO userDTO = naverService.getUserInfo(tokenDTO.getAccessToken());
-
-        // 이메일로 사용자 조회
-        String email = userDTO.getResponse().getEmail();
-        Optional<User> loginUser = userRepository.findByEmailV3(email, UserProvider.NAVER);
-
-        // 계정이 가입된 경우
-        if (loginUser.isPresent()) {
-            return JwtUtil.userCreate(loginUser.get());
-        } else {
-            // 계정이 가입되지 않은 경우
-            User joinUser = User.builder()
-                    .email(email)
-                    .nickname(userDTO.getResponse().getNickname())
-                    .username(userDTO.getResponse().getName())
-                    .phone(userDTO.getResponse().getMobile())
-                    .birth(LocalDateTimeFormatter.parseBirth(userDTO.getResponse().getBirthyear(), userDTO.getResponse().getBirthday()))
-                    .image(userDTO.getResponse().getProfileImage())
-                    .role(UserRole.USER)
-                    .provider(UserProvider.NAVER)
                     .status(UserStatus.ACTIVE)
                     .build();
             userRepository.save(joinUser);

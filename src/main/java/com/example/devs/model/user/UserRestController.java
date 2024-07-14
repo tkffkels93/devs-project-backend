@@ -14,31 +14,13 @@ public class UserRestController {
     private final UserService userService;
 
     // https://kauth.kakao.com/oauth/authorize?redirect_uri=http://localhost:8080/api/users/oauth/kakao&response_type=code&client_id=3e811404984aeead4e15eeeb1393907f
-    // 카카오 로그인
-//    @GetMapping("/oauth/kakao")
-//    public ResponseEntity<?> kakaoLogin(String code){
-//        String jwt = userService.kakaoLoginV2(code);
-//        return ResponseEntity.ok()
-//                .header(JwtVO.HEADER, JwtVO.PREFIX + jwt)
-//                .body(new ApiUtil<>(null));
-//    }
-
     // https://nid.naver.com/oauth2.0/authorize?redirect_uri=http://localhost:8080/api/users/oauth/naver&response_type=code&client_id=nfdBh7_HSSjdAvaBPLWs
-    // 네이버 로그인
-//    @GetMapping("/oauth/naver")
-//    public  ResponseEntity<?> naverLogin(String code){
-//        String jwt = userService.naverLoginV2(code);
-//        return ResponseEntity.ok()
-//                .header(JwtVO.HEADER, JwtVO.PREFIX + jwt)
-//                .body(new ApiUtil<>(null));
-//    }
-
     // OAuth 로그인
     @GetMapping("/oauth/{provider}")
     public ResponseEntity<?> oauthLogin(@PathVariable("provider") String provider, @RequestParam("code") String code) {
         UserProvider userProvider;
         userProvider = UserProvider.valueOf(provider.toUpperCase());
-        String jwt = userService.getOAuthUserInfo(userProvider, code);
+        String jwt = userService.oauthLogin(userProvider, code);
         return ResponseEntity.ok()
                 .header(JwtVO.HEADER, JwtVO.PREFIX + jwt)
                 .body(new ApiUtil<>(null));

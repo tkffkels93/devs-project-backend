@@ -6,7 +6,6 @@ import com.example.devs._core.utils.LocalDateTimeFormatter;
 import com.example.devs._core.utils.ScopeConverter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import lombok.Builder;
 import lombok.Data;
 
 import java.sql.Timestamp;
@@ -119,36 +118,6 @@ public class UserResponse {
         private Integer refreshTokenExpiresIn;
     }
 
-    // 유저 로그인 DTO
-    @Builder
-    @Data
-    public static class OAuthUserDTO {
-        private Integer id;
-        private String email;
-
-        public OAuthUserDTO(Integer id, String email) {
-            this.id = id;
-            this.email = email;
-        }
-    }
-
-    // 카카오 토큰 DTO
-    @Data
-    public static class KakaoTokenDTO {
-        @JsonProperty("access_token")
-        private String accessToken;
-        @JsonProperty("token_type")
-        private String tokenType;
-        @JsonProperty("refresh_token")
-        private String refreshToken;
-        @JsonProperty("expires_in")
-        private Integer expiresIn;
-        @JsonDeserialize(using = ScopeConverter.class)
-        private List<String> scope;
-        @JsonProperty("refresh_token_expires_in")
-        private Integer refreshTokenExpiresIn;
-    }
-
     // 카카오 유저 DTO
     @Data
     public static class KakaoUserDTO {
@@ -163,19 +132,6 @@ public class UserResponse {
             @JsonProperty("profile_image")
             private String profileImage;
         }
-    }
-
-    // 네이버 토큰 DTO
-    @Data
-    public static class NaverTokenDTO {
-        @JsonProperty("access_token")
-        private String accessToken;
-        @JsonProperty("refresh_token")
-        private String refreshToken;
-        @JsonProperty("token_type")
-        private String tokenType;
-        @JsonProperty("expires_in")
-        private Integer expiresIn;
     }
 
     // 네이버 유저 DTO
@@ -198,5 +154,4 @@ public class UserResponse {
             private String birthyear;
         }
     }
-
 }
