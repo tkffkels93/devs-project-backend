@@ -110,7 +110,6 @@ public class UserService {
 
     public String login(UserRequest.LoginDTO loginDTO) {
         String msg = "아이디 혹은 비밀번호가 잘못되었습니다.";
-        System.out.println(loginDTO.getEmail());
         User user = userRepository.findByEmail(loginDTO.getEmail())
                 .orElseThrow(() -> new Exception404(msg));
         //비밀번호 비교

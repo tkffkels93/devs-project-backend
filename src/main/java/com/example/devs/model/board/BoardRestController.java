@@ -1,7 +1,10 @@
 package com.example.devs.model.board;
 
+import com.example.devs._core.enums.BoardRole;
 import com.example.devs._core.utils.ApiUtil;
+import com.example.devs.model.user.SessionUser;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +21,15 @@ public class BoardRestController {
 
     @GetMapping("/list")
     //게시글 목록 가져오기 - page(페이지수), size(한페이지당글개수)
-    public ResponseEntity<?> boardList(HttpServletRequest request, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size) {
-        Page<BoardResponse.ListDTO> boardList = boardService.getBoards(page-1, size);
+    public ResponseEntity<?> boardList(HttpServletRequest request,
+                                       @RequestParam(defaultValue = "1") int page,
+                                       @RequestParam(defaultValue = "10") int size,
+                                       @RequestParam(defaultValue = "Board") BoardRole boardRole) {
+        //현재 접속한 사용자 아이디 가져오기
+        HttpSession session = request.getSession();
+        SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
+        System.out.println(sessionUser.getId());
+        Page<BoardResponse.ListDTO> boardList = boardService.getBoards(page-1, size, boardRole, sessionUser.getId());
         return ResponseEntity.ok(new ApiUtil<>(boardList)); //회원가입성공
     }
 }

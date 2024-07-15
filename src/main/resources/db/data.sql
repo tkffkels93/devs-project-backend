@@ -165,3 +165,195 @@ VALUES (1, 1, NOW(), NULL),
        (8, 16, NOW(), NULL),
        (9, 18, NOW(), NULL),
        (10, 20, NOW(), NULL);
+
+-- 좋아요 테이블
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (1, 1, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (2, 1, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (3, 1, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (4, 1, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (5, 1, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (6, 1, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (7, 1, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (8, 1, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (9, 1, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (10, 1, 'Board', NOW());
+
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (1, 2, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (2, 2, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (3, 2, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (4, 2, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (5, 2, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (6, 2, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (7, 2, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (8, 2, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (9, 2, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (10, 2, 'Board', NOW());
+
+-- 이 패턴을 계속해서 적용하여 1부터 10까지의 board_id에 대해 생성
+
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (1, 3, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (2, 3, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (3, 3, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (4, 3, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (5, 3, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (6, 3, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (7, 3, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (8, 3, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (9, 3, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (10, 3, 'Board', NOW());
+
+-- 같은 방식으로 4부터 10까지의 board_id에 대해 추가
+
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (1, 4, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (2, 4, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (3, 4, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (4, 4, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (5, 4, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (6, 4, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (7, 4, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (8, 4, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (9, 4, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (10, 4, 'Board', NOW());
+
+-- 같은 방식으로 5부터 10까지의 board_id에 대해 추가
+
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (1, 5, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (2, 5, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (3, 5, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (4, 5, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (5, 5, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (6, 5, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (7, 5, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (8, 5, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (9, 5, 'Board', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (10, 5, 'Board', NOW());
+
+-- BoardRole: Inquiry (1부터 10까지의 board_id)
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (1, 1, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (2, 1, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (3, 1, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (4, 1, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (5, 1, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (6, 1, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (7, 1, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (8, 1, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (9, 1, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (10, 1, 'Inquiry', NOW());
+
+-- 같은 방식으로 2부터 10까지의 board_id에 대해 추가
+
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (1, 2, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (2, 2, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (3, 2, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (4, 2, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (5, 2, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (6, 2, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (7, 2, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (8, 2, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (9, 2, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (10, 2, 'Inquiry', NOW());
+
+-- 같은 방식으로 3부터 10까지의 board_id에 대해 추가
+
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (1, 3, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (2, 3, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (3, 3, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (4, 3, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (5, 3, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (6, 3, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (7, 3, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (8, 3, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (9, 3, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (10, 3, 'Inquiry', NOW());
+
+-- 같은 방식으로 4부터 10까지의 board_id에 대해 추가
+
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (1, 4, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (2, 4, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (3, 4, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (4, 4, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (5, 4, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (6, 4, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (7, 4, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (8, 4, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (9, 4, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (10, 4, 'Inquiry', NOW());
+
+-- 같은 방식으로 5부터 10까지의 board_id에 대해 추가
+
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (1, 5, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (2, 5, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (3, 5, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (4, 5, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (5, 5, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (6, 5, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (7, 5, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (8, 5, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (9, 5, 'Inquiry', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (10, 5, 'Inquiry', NOW());
+
+-- BoardRole: Answer (1부터 10까지의 board_id)
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (1, 1, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (2, 1, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (3, 1, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (4, 1, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (5, 1, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (6, 1, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (7, 1, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (8, 1, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (9, 1, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (10, 1, 'Answer', NOW());
+
+-- 같은 방식으로 2부터 10까지의 board_id에 대해 추가
+
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (1, 2, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (2, 2, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (3, 2, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (4, 2, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (5, 2, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (6, 2, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (7, 2, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (8, 2, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (9, 2, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (10, 2, 'Answer', NOW());
+
+-- 같은 방식으로 3부터 10까지의 board_id에 대해 추가
+
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (1, 3, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (2, 3, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (3, 3, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (4, 3, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (5, 3, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (6, 3, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (7, 3, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (8, 3, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (9, 3, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (10, 3, 'Answer', NOW());
+
+-- 같은 방식으로 4부터 10까지의 board_id에 대해 추가
+
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (1, 4, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (2, 4, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (3, 4, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (4, 4, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (5, 4, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (6, 4, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (7, 4, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (8, 4, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (9, 4, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (10, 4, 'Answer', NOW());
+
+-- 같은 방식으로 5부터 10까지의 board_id에 대해 추가
+
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (1, 5, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (2, 5, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (3, 5, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (4, 5, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (5, 5, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (6, 5, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (7, 5, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (8, 5, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (9, 5, 'Answer', NOW());
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (10, 5, 'Answer', NOW());
+
+INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (7, 7, 'Board', NOW());

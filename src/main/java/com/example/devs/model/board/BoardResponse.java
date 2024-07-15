@@ -75,6 +75,11 @@ public class BoardResponse {
         private String userPosition;
         private String userImage;
         private String userCreatedAt;
+        private String userCreatedAtDuration;
+        private boolean myLike;
+        private boolean myBookmark;
+        private Integer likeCount;
+        private Integer bookmarkCount;
 
         public ListDTO(Board board) {
             this.boardId = board.getId();
@@ -86,6 +91,11 @@ public class BoardResponse {
             this.userPosition = board.getUser().getPosition();
             this.userImage = board.getUser().getImage();
             this.userCreatedAt = board.getUser().getCreatedAt().toString();
+            this.userCreatedAtDuration = LocalDateTimeFormatter.getDuration(board.getCreatedAt());
+            this.myLike = false;
+            this.myBookmark = false;
+            this.likeCount = 0;
+            this.bookmarkCount = 0;
         }
     }
 }

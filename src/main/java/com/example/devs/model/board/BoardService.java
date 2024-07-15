@@ -1,21 +1,20 @@
 package com.example.devs.model.board;
 
-import jakarta.transaction.Transactional;
 import com.example.devs._core.enums.BoardRole;
 import com.example.devs._core.enums.BoardStatus;
 import com.example.devs._core.errors.exception.Exception400;
 import com.example.devs._core.errors.exception.Exception401;
 import com.example.devs._core.errors.exception.Exception403;
 import com.example.devs._core.errors.exception.Exception404;
+import com.example.devs.model.like.LikeRepository;
 import com.example.devs.model.user.User;
 import com.example.devs.model.user.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,13 +23,33 @@ import java.util.Optional;
 public class BoardService {
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
+    private final LikeRepository likeRepository;
 
+    //게시글 목록 불러오기 ( 일반 사용자용 )
     @Transactional
-    public Page<BoardResponse.ListDTO> getBoards(int page, int size){
+    public Page<BoardResponse.ListDTO> getBoards(int page, int size, BoardRole boardRole, Integer userId){
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Board> boards =  boardRepository.findAll(pageable);
-        return boards.map(BoardResponse.ListDTO::new);
+
+        //게시글을 페이지 단위로 불러온다
+        Page<Board> boards =  boardRepository.findAllByBoardRole(pageable, boardRole);
+
+        List<Board> boardList = boards.getContent();
+        List<BoardResponse.ListDTO> boardDtoList = new ArrayList<>();
+
+        //게시글 하나를 부를때마다
+        for (Board board : boardList) {
+            BoardResponse.ListDTO dto = new BoardResponse.ListDTO(board);
+            //게시글의 작성자와 현재 세션의 사용자 아이디가 동일한지 검사 (자기가 작성한 글이면)
+            if(board.getUser().getId().equals(userId) ) {
+                //좋아요 눌렀는지 확인 ( db에서 count가 1 이상이면 )
+                Integer likeCount = likeRepository.countLike(boardRole, board.getId(), userId);
+                //myLike를 true 설정한다 (기본값은 false)
+                dto.setMyLike(likeCount != null && likeCount > 0);
+            }
+            boardDtoList.add(dto);
+        }
+        return new PageImpl<>(boardDtoList, pageable, boards.getTotalElements());
     }
 
 
