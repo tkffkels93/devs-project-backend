@@ -1,5 +1,6 @@
 package com.example.devs;
 
+import com.example.devs._core.enums.BoardRole;
 import com.example.devs.model.board.Board;
 import com.example.devs.model.board.BoardRepository;
 import com.example.devs.model.board.BoardResponse;
@@ -18,18 +19,26 @@ public class BoardTest {
     @Test
     public void test() {
         Pageable pageable = PageRequest.of(0, 10);
-        Page<Board> boards =  boardRepository.findAll(pageable);
+        Page<Board> boards = boardRepository.findAllByBoardRole(pageable, BoardRole.Board);
+
         Page<BoardResponse.ListDTO> boards2 = boards.map(BoardResponse.ListDTO::new);
-        boards2.forEach(
-                board -> System.out.println(board)
+                boards2.forEach(
+                        System.out::println
         );
+
+//        Page<Board> boards =  boardRepository.findAll(pageable);
+//        Page<BoardResponse.ListDTO> boards2 = boards.map(BoardResponse.ListDTO::new);
+//        boards2.forEach(
+//                board -> System.out.println(board)
+//        );
+
 //        Page<BoardResponse.ListDTO> boards.map(BoardResponse.ListDTO::new).stream().toList();
 //
 //        Page<Board> boards = boardRepository.findAll(pageable);
 //        Page<BoardDTO> boardDTOs = boards.map(BoardMapper::toDto);
 
 
-        boards.forEach(System.out::println);
+//        boards.forEach(System.out::println);
 //        System.out.println("boards = " + boards);
 
     }

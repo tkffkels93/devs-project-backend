@@ -48,7 +48,7 @@ public class Board {
     public Board(Integer id, User user, com.example.devs._core.enums.BoardRole boardRole, String title, String content, Integer hit, BoardStatus status, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.user = user;
-        BoardRole = boardRole;
+        this.BoardRole = boardRole;
         this.title = title;
         this.content = content;
         this.hit = hit;
