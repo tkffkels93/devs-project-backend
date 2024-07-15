@@ -111,7 +111,7 @@ public class UserResponse {
 
     // 카카오 전용 추가 토큰 정보 DTO
     @Data
-    public static class KakaoTokenDTOV2 extends OAuthTokenDTO {
+    public static class KakaoTokenDTO extends OAuthTokenDTO {
         @JsonDeserialize(using = ScopeConverter.class)
         private List<String> scope;
         @JsonProperty("refresh_token_expires_in")
