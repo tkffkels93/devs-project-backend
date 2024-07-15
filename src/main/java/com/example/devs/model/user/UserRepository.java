@@ -1,5 +1,6 @@
 package com.example.devs.model.user;
 
+import com.example.devs._core.enums.UserProvider;
 import com.example.devs._core.enums.UserRole;
 import com.example.devs._core.enums.UserStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,9 +20,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("select u from User u where u.role = :role and u.status in :status order by u.id desc")
     List<User> findByRoleAndStatusIn(@Param("role") UserRole role, @Param("status") List<UserStatus> status);
 
-    @Query("select u from User u where u.email = :email")
-    User findByEmailV2(String email);
-
     @Query("select u from User u where u.email = :email and u.provider = 'EMAIL'")
     Optional<User> findByEmail(String email);
+
+    // 이메일로 회원정보 조회
+    @Query("select u from User u where u.email = :email and u.provider = :provider")
+    Optional<User> findByEmailAndProvider(@Param("email") String email, @Param("provider") UserProvider provider);
 }

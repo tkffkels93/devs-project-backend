@@ -96,9 +96,9 @@ public class UserResponse {
         }
     }
 
-    // 카카오 토큰 DTO
+    // 공통 OAuth 토큰 정보 DTO
     @Data
-    public static class KakaoTokenDTO {
+    public static class OAuthTokenDTO {
         @JsonProperty("access_token")
         private String accessToken;
         @JsonProperty("token_type")
@@ -107,6 +107,11 @@ public class UserResponse {
         private String refreshToken;
         @JsonProperty("expires_in")
         private Integer expiresIn;
+    }
+
+    // 카카오 전용 추가 토큰 정보 DTO
+    @Data
+    public static class KakaoTokenDTO extends OAuthTokenDTO {
         @JsonDeserialize(using = ScopeConverter.class)
         private List<String> scope;
         @JsonProperty("refresh_token_expires_in")
@@ -129,19 +134,6 @@ public class UserResponse {
         }
     }
 
-    // 네이버 토큰 DTO
-    @Data
-    public static class NaverTokenDTO {
-        @JsonProperty("access_token")
-        private String accessToken;
-        @JsonProperty("refresh_token")
-        private String refreshToken;
-        @JsonProperty("token_type")
-        private String tokenType;
-        @JsonProperty("expires_in")
-        private Integer expiresIn;
-    }
-
     // 네이버 유저 DTO
     @Data
     public static class NaverUserDTO {
@@ -162,5 +154,4 @@ public class UserResponse {
             private String birthyear;
         }
     }
-
 }
