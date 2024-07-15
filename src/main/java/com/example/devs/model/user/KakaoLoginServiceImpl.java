@@ -31,7 +31,7 @@ public class KakaoLoginServiceImpl implements OAuthLoginService {
     }
 
     @Override
-    public UserResponse.KakaoTokenDTOV2 getAccessToken(String authorizationCode) {
+    public UserResponse.KakaoTokenDTO getAccessToken(String authorizationCode) {
         // 1. RestTemplate 설정
         RestTemplate restTemplate = new RestTemplate();
 
@@ -50,11 +50,11 @@ public class KakaoLoginServiceImpl implements OAuthLoginService {
         HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(tokenRequestBody, tokenRequestHeaders);
 
         // 5. api 요청하기 (토큰 받기)
-        ResponseEntity<UserResponse.KakaoTokenDTOV2> accessToken = restTemplate.exchange(
+        ResponseEntity<UserResponse.KakaoTokenDTO> accessToken = restTemplate.exchange(
                 KAKAO_TOKEN_REQUEST_URL,
                 HttpMethod.POST,
                 tokenRequest,
-                UserResponse.KakaoTokenDTOV2.class);
+                UserResponse.KakaoTokenDTO.class);
 
         return accessToken.getBody();
     }
