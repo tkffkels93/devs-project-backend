@@ -15,14 +15,13 @@ public interface BoardRepository extends JpaRepository<Board, Integer> {
     @Query("select b from Board b join b.user u where b.BoardRole = :BoardRole order by b.id")
     List<Board> findByBoardRole(@Param("BoardRole") BoardRole BoardRole);
 
-    //게시글 목록 불러오기
-    @Query("SELECT b from Board b where b.BoardRole = :boardRole")
-    Page<Board> findAllByBoardRole(Pageable pageable, @Param("boardRole") BoardRole boardRole);
-
-//    @Query("SELECT b, COUNT(l) " +
-//            "FROM Board b " +
-//            "JOIN Like l ON b.id = l.board.id AND l.boardRole = :boardRole " +
-//            "WHERE b.BoardRole = :boardRole AND b.id = :boardId " +
-//            "GROUP BY b")
-//    Page<Object[]> findAllByBoardRole(Pageable pageable, @Param("boardRole") BoardRole boardRole);
+    //게시글 목록 불러오기, 좋아요와 북마크 개수를 조인해서 가져온다
+    @Query("SELECT b, COUNT(DISTINCT l.id), COUNT(DISTINCT k.id) " +
+            "FROM Board b " +
+            "LEFT JOIN Like l ON b.id = l.board.id AND l.boardRole = :boardRole " +
+            "LEFT JOIN Bookmark k ON b.id = k.board.id AND k.boardRole = :boardRole " +
+            "WHERE b.BoardRole = :boardRole " +
+            "GROUP BY b " +
+            "ORDER BY b.id DESC")
+    Page<Object[]> findAllByBoardRole(Pageable pageable, @Param("boardRole") BoardRole boardRole);
 }

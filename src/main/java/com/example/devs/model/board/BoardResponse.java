@@ -78,8 +78,8 @@ public class BoardResponse {
         private String userCreatedAtDuration;
         private boolean myLike;
         private boolean myBookmark;
-        private Integer likeCount;
-        private Integer bookmarkCount;
+        private Long likeCount;
+        private Long bookmarkCount;
 
         public ListDTO(Board board) {
             this.boardId = board.getId();
@@ -94,8 +94,8 @@ public class BoardResponse {
             this.userCreatedAtDuration = LocalDateTimeFormatter.getDuration(board.getCreatedAt());
             this.myLike = false;
             this.myBookmark = false;
-            this.likeCount = 0;
-            this.bookmarkCount = 0;
+            this.likeCount = 0L;
+            this.bookmarkCount = 0L;
         }
     }
 }
