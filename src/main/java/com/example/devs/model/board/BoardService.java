@@ -1,21 +1,21 @@
 package com.example.devs.model.board;
 
-import jakarta.transaction.Transactional;
 import com.example.devs._core.enums.BoardRole;
 import com.example.devs._core.enums.BoardStatus;
 import com.example.devs._core.errors.exception.Exception400;
 import com.example.devs._core.errors.exception.Exception401;
 import com.example.devs._core.errors.exception.Exception403;
 import com.example.devs._core.errors.exception.Exception404;
+import com.example.devs.model.bookmark.BookmarkService;
+import com.example.devs.model.like.LikeService;
 import com.example.devs.model.user.User;
 import com.example.devs.model.user.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,13 +24,48 @@ import java.util.Optional;
 public class BoardService {
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
+    private final LikeService likeService;
+    private final BookmarkService bookmarkService;
 
+    //게시글 목록 불러오기 ( 일반 사용자용 )
     @Transactional
-    public Page<BoardResponse.ListDTO> getBoards(int page, int size){
+    public Page<BoardResponse.ListDTO> getBoards(int page, int size, BoardRole boardRole, Integer userId){
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Board> boards =  boardRepository.findAll(pageable);
-        return boards.map(BoardResponse.ListDTO::new);
+
+        Page<Object[]> boards =  boardRepository.findAllByBoardRole(pageable, boardRole);
+        List<Object[]> boardList = boards.getContent();
+        List<BoardResponse.ListDTO> boardDtoList = new ArrayList<>();
+
+        for (Object[] result : boardList) {
+            Board board = (Board) result[0];
+            Long likeCount = (Long) result[1];
+            Long bookmarkCount = (Long) result[2];
+            Long replyCount = (Long) result[3];
+            BoardResponse.ListDTO dto = new BoardResponse.ListDTO(board);
+            //좋아요와 북마크 개수를 셋팅한다
+            dto.setLikeCount(likeCount);
+            dto.setBookmarkCount(bookmarkCount);
+            dto.setReplyCount(replyCount);
+            if(board.getUser().getId().equals(userId) ) {
+                //좋아요 눌렀는지 확인 ( db에서 count가 1 이상이면 )
+                Integer myLikeCount = likeService.getLikeCount(boardRole, board.getId(), userId);
+                Integer myBookmarkCount = bookmarkService.getBookmarkCount(boardRole, board.getId(), userId);
+
+                //myLike와 myBookmark를 true로 설정한다 (기본값은 false)
+                dto.setMyLike(myLikeCount != null && myLikeCount > 0);
+                dto.setMyBookmark(myBookmarkCount != null && myBookmarkCount > 0);
+            }
+            boardDtoList.add(dto);
+        }
+        return new PageImpl<>(boardDtoList, pageable, boards.getTotalElements());
+    }
+
+    //인기 게시글 목록(top10) 가져오기
+    @Transactional
+    public List<BoardResponse.Top10ListDTO> getTop10Boards(BoardRole boardRole){
+        List<Board> boards =  boardRepository.findTop10ByBoardRole(boardRole);
+        return boards.stream().map(BoardResponse.Top10ListDTO::new).toList();
     }
 
 
