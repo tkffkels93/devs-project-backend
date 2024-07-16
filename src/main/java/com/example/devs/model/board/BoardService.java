@@ -41,10 +41,12 @@ public class BoardService {
             Board board = (Board) result[0];
             Long likeCount = (Long) result[1];
             Long bookmarkCount = (Long) result[2];
+            Long replyCount = (Long) result[3];
             BoardResponse.ListDTO dto = new BoardResponse.ListDTO(board);
             //좋아요와 북마크 개수를 셋팅한다
             dto.setLikeCount(likeCount);
             dto.setBookmarkCount(bookmarkCount);
+            dto.setReplyCount(replyCount);
             if(board.getUser().getId().equals(userId) ) {
                 //좋아요 눌렀는지 확인 ( db에서 count가 1 이상이면 )
                 Integer myLikeCount = likeService.getLikeCount(boardRole, board.getId(), userId);
