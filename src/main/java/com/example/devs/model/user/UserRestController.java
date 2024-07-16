@@ -27,7 +27,7 @@ public class UserRestController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(UserRequest.LoginDTO loginDTO){
+    public ResponseEntity<?> login(@RequestBody UserRequest.LoginDTO loginDTO){
         String jwt = userService.login(loginDTO);
         return ResponseEntity.ok()
                 .header(JwtVO.HEADER, JwtVO.PREFIX+ jwt)
