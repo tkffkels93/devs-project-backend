@@ -1,5 +1,6 @@
 package com.example.devs.model.reply;
 
+import com.example.devs._core.enums.BoardRole;
 import com.example.devs._core.enums.ReplyStatus;
 import com.example.devs.model.board.Board;
 import com.example.devs.model.user.User;
@@ -25,6 +26,9 @@ public class Reply {
     @JoinColumn(name = "user_id")
     private User user; // User
 
+    @Enumerated(EnumType.STRING)
+    private BoardRole boardRole; // Board 구분
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private Board board; // Board
@@ -41,13 +45,11 @@ public class Reply {
     private LocalDateTime updatedAt; // 수정일
 
     @Builder
-    public Reply(Integer id, User user, Board board, String comment, ReplyStatus status, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Reply(Integer id, User user, Board board, String comment, ReplyStatus status) {
         this.id = id;
         this.user = user;
         this.board = board;
         this.comment = comment;
         this.status = status;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 }

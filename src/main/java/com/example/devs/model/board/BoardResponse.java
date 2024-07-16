@@ -80,6 +80,7 @@ public class BoardResponse {
         private boolean myBookmark;
         private Long likeCount;
         private Long bookmarkCount;
+        private Long replyCount;
 
         public ListDTO(Board board) {
             this.boardId = board.getId();
@@ -96,6 +97,7 @@ public class BoardResponse {
             this.myBookmark = false;
             this.likeCount = 0L;
             this.bookmarkCount = 0L;
+            this.replyCount = 0L;
         }
     }
 }
