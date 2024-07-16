@@ -24,6 +24,7 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final List<OAuthLoginService> oAuthLoginServices;
+    private final AccessTokenStorage accessTokenStorage;
 
     // 로그인 (관리자)
     @Transactional
@@ -151,9 +152,14 @@ public class UserService {
 
         if (provider == UserProvider.KAKAO) {
             UserResponse.KakaoUserDTO userDTO = (UserResponse.KakaoUserDTO) loginService.getUserInfo(tokenDTO.getAccessToken());
+            accessTokenStorage.saveToken(userDTO.getId().toString(), tokenDTO.getAccessToken());
+            // 액세스 토큰 출력
+            accessTokenStorage.printAllTokens();
+            //
             return findOrSaveUser(userDTO, provider);
         } else if (provider == UserProvider.NAVER) {
             UserResponse.NaverUserDTO userDTO = (UserResponse.NaverUserDTO) loginService.getUserInfo(tokenDTO.getAccessToken());
+            accessTokenStorage.saveToken(userDTO.getResponse().getId(), tokenDTO.getAccessToken());
             return findOrSaveUser(userDTO, provider);
         } else {
             throw new Exception404("지원하지 않는 OAuth 공급자입니다.");
@@ -195,6 +201,7 @@ public class UserService {
             String phone;
             LocalDate birth;
             String profileImage;
+            String providerId;
 
             if (provider == UserProvider.KAKAO) {
                 UserResponse.KakaoUserDTO kakaoUser = (UserResponse.KakaoUserDTO) userDTO;
@@ -203,6 +210,7 @@ public class UserService {
                 phone = "010-1234-5678"; // 임의로 설정
                 birth = LocalDate.now(); // 임의로 설정
                 profileImage = kakaoUser.getProperties().getProfileImage();
+                providerId = kakaoUser.getId().toString();
             } else {
                 UserResponse.NaverUserDTO naverUser = (UserResponse.NaverUserDTO) userDTO;
                 nickname = naverUser.getResponse().getNickname();
@@ -210,6 +218,7 @@ public class UserService {
                 phone = naverUser.getResponse().getMobile();
                 birth = LocalDateTimeFormatter.parseBirth(naverUser.getResponse().getBirthyear(), naverUser.getResponse().getBirthday());
                 profileImage = naverUser.getResponse().getProfileImage();
+                providerId = naverUser.getResponse().getId();
             }
 
             User joinUser = User.builder()
@@ -220,11 +229,37 @@ public class UserService {
                     .birth(birth)
                     .image(profileImage)
                     .role(UserRole.USER)
+                    .providerId(providerId)
                     .provider(provider)
                     .status(UserStatus.ACTIVE)
                     .build();
             userRepository.save(joinUser);
             return JwtUtil.userCreate(joinUser);
         }
+    }
+
+    // OAuth 계정 연결 해제
+    public void oauthUnlink(UserProvider userProvider, String jwt) {
+        // 해당 OAuth 공급자에 대한 서비스 가져오기
+        OAuthLoginService<?> oauthLoginService = getOAuthProvider(userProvider);
+
+        // JWT에서 사용자 ID 추출
+        int id = JwtUtil.getUserIdFromJwt(jwt);
+
+        // 사용자 데이터 조회
+        Optional<User> user = userRepository.findById(id);
+
+        // Provider ID 및 저장된 Access Token 가져오기
+        String providerId = user.get().getProviderId();
+        String accessToken = accessTokenStorage.getToken(providerId);
+
+        // OAuth 공급자와의 연결 끊기
+        oauthLoginService.unlink(providerId, accessToken);
+
+        // 저장된 Access Token 삭제
+        accessTokenStorage.deleteToken(providerId);
+
+        // 사용자 데이터 삭제
+        userRepository.deleteById(id);
     }
 }

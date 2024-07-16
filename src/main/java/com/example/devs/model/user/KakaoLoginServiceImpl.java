@@ -21,9 +21,10 @@ public class KakaoLoginServiceImpl implements OAuthLoginService {
 
     // 카카오 관련 상수
     public static final String KAKAO_CLIENT_ID = "3e811404984aeead4e15eeeb1393907f"; // 카카오 클라이언트 ID
-    public static final String KAKAO_REDIRECT_URI = "http://localhost:8080/api/users/oauth/kakao"; // 카카오 리디렉션 URI
+    public static final String KAKAO_REDIRECT_URI = "http://localhost:8080/api/users/oauth/kakao"; // 카카오 리다이렉션 URI
     public static final String KAKAO_TOKEN_REQUEST_URL = "https://kauth.kakao.com/oauth/token"; // 카카오 토큰 요청 URL
     public static final String KAKAO_USER_INFO_URL = "https://kapi.kakao.com/v2/user/me"; // 카카오 사용자 정보 요청 URL
+    public static final String KAKAO_UNLINK_URL = "https://kapi.kakao.com/v1/user/unlink"; // 카카오 연결 해제 요청 URL
 
     @Override
     public UserProvider getProvider() {
@@ -80,5 +81,32 @@ public class KakaoLoginServiceImpl implements OAuthLoginService {
                 UserResponse.KakaoUserDTO.class);
 
         return userInfoResponse.getBody();
+    }
+
+    @Override
+    public Long unlink(String providerId, String accessToken) {
+        // 1. RestTemplate 설정
+        RestTemplate restTemplate = new RestTemplate();
+
+        // 2. http header 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(JwtVO.HEADER, JwtVO.PREFIX + accessToken);
+
+        // 3. http body 설정
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("target_id_type", "user_id");
+        body.add("target_id", providerId);
+
+        // 4. body + header 객체 만들기
+        HttpEntity<MultiValueMap<String, String>> unlinkRequest = new HttpEntity<>(body, headers);
+
+        // 5. api 요청하기 (연결 끊기)
+        ResponseEntity<UserResponse.KakaoUnlinkDTO> unlinkResponse = restTemplate.exchange(
+                KAKAO_UNLINK_URL,
+                HttpMethod.POST,
+                unlinkRequest,
+                UserResponse.KakaoUnlinkDTO.class);
+
+        return unlinkResponse.getBody().getId();
     }
 }

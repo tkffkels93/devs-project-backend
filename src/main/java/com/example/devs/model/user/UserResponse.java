@@ -134,6 +134,12 @@ public class UserResponse {
         }
     }
 
+    // 카카오 연결 해제 DTO
+    @Data
+    public static class KakaoUnlinkDTO {
+        private Long id;
+    }
+
     // 네이버 유저 DTO
     @Data
     public static class NaverUserDTO {

@@ -81,4 +81,9 @@ public class NaverLoginServiceImpl implements OAuthLoginService {
 
         return userInfoResponse.getBody();
     }
+
+    @Override
+    public Object unlink(String providerId, String accessToken) {
+        return null;
+    }
 }

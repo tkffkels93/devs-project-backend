@@ -21,9 +21,18 @@ public class UserRestController {
         UserProvider userProvider;
         userProvider = UserProvider.valueOf(provider.toUpperCase());
         String jwt = userService.oauthLogin(userProvider, code);
+        System.out.println("########### JWT ###########: " + jwt.toString());
         return ResponseEntity.ok()
                 .header(JwtVO.HEADER, JwtVO.PREFIX + jwt)
                 .body(new ApiUtil<>(null));
+    }
+
+    @PostMapping("/unlink/{provider}")
+    public ResponseEntity<?> oauthUnlink(@PathVariable("provider") String provider, @RequestHeader("Authorization") String jwt){
+        UserProvider userProvider;
+        userProvider = UserProvider.valueOf(provider.toUpperCase());
+        userService.oauthUnlink(userProvider, jwt);
+        return ResponseEntity.ok().body(new ApiUtil<>(null));
     }
 
     @PostMapping("/login")
