@@ -25,4 +25,14 @@ public interface BoardRepository extends JpaRepository<Board, Integer> {
             "GROUP BY b " +
             "ORDER BY b.id DESC")
     Page<Object[]> findAllByBoardRole(Pageable pageable, @Param("boardRole") BoardRole boardRole);
+
+    //인기게시글 top10불러오기 (조회수 높은 순, 그다음 좋아요 횟수 기준)
+    @Query("SELECT b " +
+            "FROM Board b " +
+            "LEFT JOIN Like l ON b.id = l.board.id AND l.boardRole = :boardRole " +
+            "WHERE b.BoardRole = :boardRole " +
+            "GROUP BY b " +
+            "ORDER BY b.hit DESC, COUNT(DISTINCT l.id) DESC " +
+            "LIMIT 10")
+    List<Board> findTop10ByBoardRole(@Param("boardRole") BoardRole boardRole);
 }

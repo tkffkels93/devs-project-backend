@@ -70,12 +70,12 @@ public class BoardResponse {
         private String boardTitle;
         private String boardContent;
         private Integer boardHit;
+        private String boardCreatedAt;
+        private String boardCreatedAtDuration;
         private Integer userId;
         private String userNickname;
         private String userPosition;
         private String userImage;
-        private String userCreatedAt;
-        private String userCreatedAtDuration;
         private boolean myLike;
         private boolean myBookmark;
         private Long likeCount;
@@ -91,8 +91,8 @@ public class BoardResponse {
             this.userNickname = board.getUser().getNickname();
             this.userPosition = board.getUser().getPosition();
             this.userImage = board.getUser().getImage();
-            this.userCreatedAt = board.getUser().getCreatedAt().toString();
-            this.userCreatedAtDuration = LocalDateTimeFormatter.getDuration(board.getCreatedAt());
+            this.boardCreatedAt = board.getCreatedAt().toString();
+            this.boardCreatedAtDuration = LocalDateTimeFormatter.getDuration(board.getCreatedAt());
             this.myLike = false;
             this.myBookmark = false;
             this.likeCount = 0L;
@@ -100,4 +100,28 @@ public class BoardResponse {
             this.replyCount = 0L;
         }
     }
+
+    @Data
+    public static class Top10ListDTO{
+        private Integer boardId;
+        private String boardTitle;
+        private String boardCreatedAt;
+        private String boardCreatedAtDuration;
+        private Integer userId;
+        private String userNickname;
+        private String userPosition;
+        private String userImage;
+
+        public Top10ListDTO(Board board) {
+            this.boardId = board.getId();
+            this.boardTitle = board.getTitle();
+            this.userId = board.getUser().getId();
+            this.userNickname = board.getUser().getNickname();
+            this.userPosition = board.getUser().getPosition();
+            this.userImage = board.getUser().getImage();
+            this.boardCreatedAt = board.getCreatedAt().toString();
+            this.boardCreatedAtDuration = LocalDateTimeFormatter.getDuration(board.getCreatedAt());
+        }
+    }
+
 }
