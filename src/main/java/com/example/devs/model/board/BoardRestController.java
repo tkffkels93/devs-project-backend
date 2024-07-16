@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RequestMapping("/api/boards")
 @RestController
@@ -28,8 +30,15 @@ public class BoardRestController {
         //현재 접속한 사용자 아이디 가져오기
         HttpSession session = request.getSession();
         SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
-        System.out.println(sessionUser.getId());
+
         Page<BoardResponse.ListDTO> boardList = boardService.getBoards(page-1, size, boardRole, sessionUser.getId());
-        return ResponseEntity.ok(new ApiUtil<>(boardList)); //회원가입성공
+        return ResponseEntity.ok(new ApiUtil<>(boardList));
+    }
+
+    //인기게시글 (top10) 가져오기
+    @GetMapping("/top10List")
+    public ResponseEntity<?> boardTop10List(HttpServletRequest request) {
+        List<BoardResponse.Top10ListDTO> boardList = boardService.getTop10Boards(BoardRole.Board);
+        return ResponseEntity.ok(new ApiUtil<>(boardList));
     }
 }

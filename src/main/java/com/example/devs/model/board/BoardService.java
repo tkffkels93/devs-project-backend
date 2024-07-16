@@ -61,6 +61,13 @@ public class BoardService {
         return new PageImpl<>(boardDtoList, pageable, boards.getTotalElements());
     }
 
+    //인기 게시글 목록(top10) 가져오기
+    @Transactional
+    public List<BoardResponse.Top10ListDTO> getTop10Boards(BoardRole boardRole){
+        List<Board> boards =  boardRepository.findTop10ByBoardRole(boardRole);
+        return boards.stream().map(BoardResponse.Top10ListDTO::new).toList();
+    }
+
 
     // 게시글 리스트 (관리자)
     public BoardResponse.BoardListDTO getBoardList(User sessionAdmin) {
