@@ -6,7 +6,8 @@ import com.example.devs._core.errors.exception.Exception400;
 import com.example.devs._core.errors.exception.Exception401;
 import com.example.devs._core.errors.exception.Exception403;
 import com.example.devs._core.errors.exception.Exception404;
-import com.example.devs.model.like.LikeRepository;
+import com.example.devs.model.bookmark.BookmarkService;
+import com.example.devs.model.like.LikeService;
 import com.example.devs.model.user.User;
 import com.example.devs.model.user.UserRepository;
 import jakarta.transaction.Transactional;
@@ -23,7 +24,8 @@ import java.util.Optional;
 public class BoardService {
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
-    private final LikeRepository likeRepository;
+    private final LikeService likeService;
+    private final BookmarkService bookmarkService;
 
     //게시글 목록 불러오기 ( 일반 사용자용 )
     @Transactional
@@ -43,9 +45,12 @@ public class BoardService {
             //게시글의 작성자와 현재 세션의 사용자 아이디가 동일한지 검사 (자기가 작성한 글이면)
             if(board.getUser().getId().equals(userId) ) {
                 //좋아요 눌렀는지 확인 ( db에서 count가 1 이상이면 )
-                Integer likeCount = likeRepository.countLike(boardRole, board.getId(), userId);
-                //myLike를 true 설정한다 (기본값은 false)
+                Integer likeCount = likeService.getLikeCount(boardRole, board.getId(), userId);
+                Integer bookmarkCount = bookmarkService.getBookmarkCount(boardRole, board.getId(), userId);
+
+                //myLike와 myBookmark를 true로 설정한다 (기본값은 false)
                 dto.setMyLike(likeCount != null && likeCount > 0);
+                dto.setMyBookmark(bookmarkCount != null && bookmarkCount > 0);
             }
             boardDtoList.add(dto);
         }

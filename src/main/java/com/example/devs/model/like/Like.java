@@ -35,7 +35,6 @@ public class Like {
     private LocalDateTime createdAt; // 생성일
 
     @Builder
-
     public Like(Integer id, User user, BoardRole boardRole, Board board) {
         this.id = id;
         this.user = user;

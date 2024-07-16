@@ -144,27 +144,30 @@ VALUES (1, 'photo_1.jpg', '/photos/1/photo_1.jpg'),
        (20, 'photo_20.jpg', '/photos/20/photo_20.jpg');
 
 -- Bookmark 엔터티용 더미 데이터 생성
-INSERT INTO bookmark_tb (user_id, board_id, created_at, updated_at)
-VALUES (1, 1, NOW(), NULL),
-       (2, 3, NOW(), NULL),
-       (3, 5, NOW(), NULL),
-       (4, 7, NOW(), NULL),
-       (5, 9, NOW(), NULL),
-       (6, 11, NOW(), NULL),
-       (7, 13, NOW(), NULL),
-       (8, 15, NOW(), NULL),
-       (9, 17, NOW(), NULL),
-       (10, 19, NOW(), NULL),
-       (1, 2, NOW(), NULL),
-       (2, 4, NOW(), NULL),
-       (3, 6, NOW(), NULL),
-       (4, 8, NOW(), NULL),
-       (5, 10, NOW(), NULL),
-       (6, 12, NOW(), NULL),
-       (7, 14, NOW(), NULL),
-       (8, 16, NOW(), NULL),
-       (9, 18, NOW(), NULL),
-       (10, 20, NOW(), NULL);
+INSERT INTO bookmark_tb (user_id, board_id, created_at, updated_at, board_role)
+VALUES (1, 1, NOW(), NULL, 'Board'),
+       (2, 3, NOW(), NULL, 'Board'),
+       (3, 5, NOW(), NULL, 'Board'),
+       (4, 7, NOW(), NULL, 'Board'),
+       (5, 9, NOW(), NULL, 'Board'),
+       (6, 11, NOW(), NULL, 'Board'),
+       (7, 13, NOW(), NULL, 'Board'),
+       (8, 15, NOW(), NULL, 'Board'),
+       (9, 17, NOW(), NULL, 'Board'),
+       (10, 19, NOW(), NULL, 'Board'),
+       (1, 2, NOW(), NULL, 'Board'),
+       (2, 4, NOW(), NULL, 'Board'),
+       (3, 6, NOW(), NULL, 'Board'),
+       (4, 8, NOW(), NULL, 'Board'),
+       (5, 10, NOW(), NULL, 'Board'),
+       (6, 12, NOW(), NULL, 'Board'),
+       (7, 14, NOW(), NULL, 'Board'),
+       (8, 16, NOW(), NULL, 'Board'),
+       (9, 18, NOW(), NULL, 'Board'),
+       (10, 20, NOW(), NULL, 'Board'),
+        (7, 7, NOW(), NULL, 'Board');
+
+
 
 -- 좋아요 테이블
 INSERT INTO like_tb (user_id, board_id, board_role, created_at) VALUES (1, 1, 'Board', NOW());
