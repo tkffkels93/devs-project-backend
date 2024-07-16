@@ -26,7 +26,7 @@ public class UserRestController {
                 .header(JwtVO.HEADER, JwtVO.PREFIX + jwt)
                 .body(new ApiUtil<>(null));
     }
-
+    // OAuth 연동 해제
     @PostMapping("/unlink/{provider}")
     public ResponseEntity<?> oauthUnlink(@PathVariable("provider") String provider, @RequestHeader("Authorization") String jwt){
         UserProvider userProvider;

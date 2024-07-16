@@ -160,6 +160,9 @@ public class UserService {
         } else if (provider == UserProvider.NAVER) {
             UserResponse.NaverUserDTO userDTO = (UserResponse.NaverUserDTO) loginService.getUserInfo(tokenDTO.getAccessToken());
             accessTokenStorage.saveToken(userDTO.getResponse().getId(), tokenDTO.getAccessToken());
+            // 액세스 토큰 출력
+            accessTokenStorage.printAllTokens();
+            //
             return findOrSaveUser(userDTO, provider);
         } else {
             throw new Exception404("지원하지 않는 OAuth 공급자입니다.");

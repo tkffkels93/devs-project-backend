@@ -160,4 +160,12 @@ public class UserResponse {
             private String birthyear;
         }
     }
+
+    // 카카오 연결 해제 DTO
+    @Data
+    public static class NaverUnlinkDTO {
+        @JsonProperty("access_token")
+        private String accessToken;
+        private String result;
+    }
 }
