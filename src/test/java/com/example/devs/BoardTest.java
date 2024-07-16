@@ -19,12 +19,12 @@ public class BoardTest {
     @Test
     public void test() {
         Pageable pageable = PageRequest.of(0, 10);
-        Page<Board> boards = boardRepository.findAllByBoardRole(pageable, BoardRole.Board);
-
-        Page<BoardResponse.ListDTO> boards2 = boards.map(BoardResponse.ListDTO::new);
-                boards2.forEach(
-                        System.out::println
-        );
+//        Page<Board> boards = boardRepository.findAllByBoardRole(pageable, BoardRole.Board);
+//
+//        Page<BoardResponse.ListDTO> boards2 = boards.map(BoardResponse.ListDTO::new);
+//                boards2.forEach(
+//                        System.out::println
+//        );
 
 //        Page<Board> boards =  boardRepository.findAll(pageable);
 //        Page<BoardResponse.ListDTO> boards2 = boards.map(BoardResponse.ListDTO::new);
