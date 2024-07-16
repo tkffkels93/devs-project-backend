@@ -81,4 +81,33 @@ public class NaverLoginServiceImpl implements OAuthLoginService {
 
         return userInfoResponse.getBody();
     }
+
+    @Override
+    public UserResponse.NaverUnlinkDTO unlink(String providerId, String accessToken) {
+        // 1. RestTemplate 설정
+        RestTemplate restTemplate = new RestTemplate();
+
+        // 2. http header 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(JwtVO.HEADER, JwtVO.PREFIX + accessToken);
+
+        // 3. http body 설정
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("client_id", NAVER_CLIENT_ID);
+        body.add("client_secret", NAVER_CLIENT_SECRET);
+        body.add("access_token", accessToken);
+        body.add("grant_type", "delete");
+
+        // 4. body + header 객체 만들기
+        HttpEntity<MultiValueMap<String, String>> unlinkRequest = new HttpEntity<>(body, headers);
+
+        // 5. api 요청하기 (연결 끊기)
+        ResponseEntity<UserResponse.NaverUnlinkDTO> unlinkResponse = restTemplate.exchange(
+                NAVER_TOKEN_REQUEST_URL,
+                HttpMethod.POST,
+                unlinkRequest,
+                UserResponse.NaverUnlinkDTO.class);
+
+        return unlinkResponse.getBody();
+    }
 }

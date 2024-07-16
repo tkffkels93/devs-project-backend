@@ -66,4 +66,15 @@ public class JwtUtil {
                 .username(name)
                 .build();
     }
+
+    // JWT 토큰에서 사용자 ID 추출
+    public static int getUserIdFromJwt(String jwt) {
+        // JWT 토큰을 해독하고 검증
+        DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC512("devs"))
+                .build()
+                .verify(jwt.replace("Bearer ", ""));
+
+        // 해독된 JWT에서 'id' 클레임을 추출
+        return decodedJWT.getClaim("id").asInt();
+    }
 }
