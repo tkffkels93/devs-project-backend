@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -34,15 +35,24 @@ public class BoardRestController {
 
     //인기게시글 (top10) 가져오기
     @GetMapping("/top10List")
-    public ResponseEntity<?> boardTop10List(HttpServletRequest request) {
+    public ResponseEntity<?> boardTop10List() {
         List<BoardResponse.Top10ListDTO> boardList = boardService.getTop10Boards(BoardRole.Board);
         return ResponseEntity.ok(new ApiUtil<>(boardList));
     }
 
     @GetMapping("/{boardId}/detail")
-    public ResponseEntity<?> boardDetail(HttpServletRequest request, @PathVariable Integer boardId) {
+    public ResponseEntity<?> boardDetail(@PathVariable Integer boardId) {
         BoardResponse.DetailDTO dto = boardService.getBoardDetail(BoardRole.Board, boardId);
         return ResponseEntity.ok(new ApiUtil<>(dto));
+    }
+
+    @PostMapping("/write")
+    public ResponseEntity<?> boardWrite(HttpServletRequest request, @RequestBody BoardRequest.Write writeDto) throws IOException {
+        HttpSession session = request.getSession();
+        SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
+        System.out.println("sessionUser.getId() = " + sessionUser.getId());
+        boardService.writeBoard(sessionUser.getId(),writeDto);
+        return ResponseEntity.ok(new ApiUtil<>(null));
     }
 
 }

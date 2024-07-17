@@ -6,8 +6,12 @@ import com.example.devs._core.errors.exception.Exception400;
 import com.example.devs._core.errors.exception.Exception401;
 import com.example.devs._core.errors.exception.Exception403;
 import com.example.devs._core.errors.exception.Exception404;
+import com.example.devs._core.utils.FileUtil;
 import com.example.devs.model.bookmark.BookmarkService;
 import com.example.devs.model.like.LikeService;
+import com.example.devs.model.photo.Photo;
+import com.example.devs.model.photo.PhotoRepository;
+import com.example.devs.model.photo.PhotoService;
 import com.example.devs.model.reply.ReplyRepository;
 import com.example.devs.model.reply.ReplyService;
 import com.example.devs.model.user.User;
@@ -17,9 +21,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @RequiredArgsConstructor
@@ -31,6 +36,8 @@ public class BoardService {
     private final BookmarkService bookmarkService;
     private final ReplyRepository replyRepository;
     private final ReplyService replyService;
+    private final PhotoRepository photoRepository;
+    private final PhotoService photoService;
 
     //게시글 목록 불러오기 ( 일반 사용자용 )
     @Transactional
@@ -71,7 +78,8 @@ public class BoardService {
     public BoardResponse.DetailDTO getBoardDetail(BoardRole boardRole, Integer boardId) {
         Board board = boardRepository.findByBoardRoleAndId(boardRole, boardId)
                 .orElseThrow(() -> new Exception404("게시물을 찾을 수 없습니다."));
-
+        //조회수 증가
+        board.setHit( board.getHit() +1 );
         List<BoardResponse.ReplyDTO> repliesDto = replyService.getReplies(boardRole, boardId);
 
         return new BoardResponse.DetailDTO(board, repliesDto);
@@ -157,5 +165,61 @@ public class BoardService {
 
         board.setStatus(BoardStatus.DELETED);
         boardRepository.save(board);
+    }
+    //일반사용자용 게시글 작성하기
+    public void writeBoard(Integer userId, BoardRequest.Write writeDto) throws IOException {
+
+        //게시글 먼저 저장. 이미지는 아래에 따로 저장
+        Board board = Board.builder()
+                        .title(writeDto.getTitle())
+                        .content(writeDto.getContent())
+                        .hit(0)
+                        .boardRole(BoardRole.Board)
+                        .status(BoardStatus.PUBLISHED)
+                        .user(User.builder().id(userId).build())
+                        .build();
+        board=boardRepository.save(board);
+
+        List<BoardRequest.Base64Image> base64Images = writeDto.getImages();
+
+        // 1. JSON으로 전달된 이미지를 순회하며 파일로 저장,
+        // 2. Photo_tb에 저장
+        for (BoardRequest.Base64Image image : base64Images) {
+
+            //1
+            byte[] imageBytes;
+            try {
+                imageBytes = Base64.getDecoder().decode(image.getImageData());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid Base64 data for image: " + image.getFileName(), e);
+            }
+
+            String originalFileName = image.getFileName();
+            String fileExtension = FileUtil.getFileExtension(originalFileName);
+            String uuidFileName = UUID.randomUUID().toString() + fileExtension;
+
+            // 저장할 디렉토리 경로 설정
+            String directoryPath = "upload/";
+            File directory = new File(directoryPath);
+            if (!directory.exists()) {
+                directory.mkdirs(); // 디렉토리가 존재하지 않으면 생성
+            }
+
+            String filePath = directoryPath + uuidFileName;
+
+            try (FileOutputStream fos = new FileOutputStream(new File(filePath))) {
+                fos.write(imageBytes);
+            } catch (IOException e) {
+                throw new IOException("Failed to save image: " + originalFileName, e);
+            }
+
+            //2
+            Photo photo = Photo.builder()
+                    .board(board)
+                    .fileName(uuidFileName)
+                    .filePath(filePath)
+                    .build();
+            photoService.savePhoto(photo);
+        }
     }
 }
