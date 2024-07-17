@@ -2,14 +2,13 @@ package com.example.devs.model.user;
 
 import com.example.devs._core.enums.UserProvider;
 import com.example.devs._core.enums.UserStatus;
-import com.example.devs.model.BaseEntity;
 import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
 
 @Data
-public class SessionUser extends BaseEntity {
+public class SessionUser {
     private Integer id; // 유저 번호
     private String email; // 이메일
     private String nickname; // 닉네임

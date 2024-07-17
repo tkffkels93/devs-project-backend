@@ -34,11 +34,11 @@ public class BoardService {
 
     //게시글 목록 불러오기 ( 일반 사용자용 )
     @Transactional
-    public Page<BoardResponse.ListDTO> getBoards(int page, int size, BoardRole boardRole, Integer userId){
+    public Page<BoardResponse.ListDTO> getBoards(int page, int size, BoardRole boardRole, Integer userId) {
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Object[]> boards =  boardRepository.findAllByBoardRole(pageable, boardRole);
+        Page<Object[]> boards = boardRepository.findAllByBoardRole(pageable, boardRole);
         List<Object[]> boardList = boards.getContent();
         List<BoardResponse.ListDTO> boardDtoList = new ArrayList<>();
 
@@ -52,7 +52,7 @@ public class BoardService {
             dto.setLikeCount(likeCount);
             dto.setBookmarkCount(bookmarkCount);
             dto.setReplyCount(replyCount);
-            if(board.getUser().getId().equals(userId) ) {
+            if (board.getUser().getId().equals(userId)) {
                 //좋아요 눌렀는지 확인 ( db에서 count가 1 이상이면 )
                 Integer myLikeCount = likeService.getLikeCount(boardRole, board.getId(), userId);
                 Integer myBookmarkCount = bookmarkService.getBookmarkCount(boardRole, board.getId(), userId);
@@ -68,19 +68,19 @@ public class BoardService {
 
     //게시글 내용 불러오기 ( 일반 사용자용 )
     @Transactional
-    public BoardResponse.DetailDTO getBoardDetail(BoardRole boardRole, Integer boardId){
+    public BoardResponse.DetailDTO getBoardDetail(BoardRole boardRole, Integer boardId) {
         Board board = boardRepository.findByBoardRoleAndId(boardRole, boardId)
                 .orElseThrow(() -> new Exception404("게시물을 찾을 수 없습니다."));
 
         List<BoardResponse.ReplyDTO> repliesDto = replyService.getReplies(boardRole, boardId);
 
-        return new BoardResponse.DetailDTO(board,repliesDto);
+        return new BoardResponse.DetailDTO(board, repliesDto);
     }
 
     //인기 게시글 목록(top10) 가져오기
     @Transactional
-    public List<BoardResponse.Top10ListDTO> getTop10Boards(BoardRole boardRole){
-        List<Board> boards =  boardRepository.findTop10ByBoardRole(boardRole);
+    public List<BoardResponse.Top10ListDTO> getTop10Boards(BoardRole boardRole) {
+        List<Board> boards = boardRepository.findTop10ByBoardRole(boardRole);
         AtomicInteger counter = new AtomicInteger(1);
         return boards.stream().map(board -> {
             BoardResponse.Top10ListDTO dto = new BoardResponse.Top10ListDTO(board);
