@@ -85,4 +85,6 @@ public class ImageUtil {
         // 업로드 결과 리스트를 반환
         return uploadResults;
     }
+
+
 }
