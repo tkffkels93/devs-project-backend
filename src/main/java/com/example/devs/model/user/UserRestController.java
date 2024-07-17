@@ -47,7 +47,7 @@ public class UserRestController {
     }
 
     @PostMapping("/join")
-    public ResponseEntity<?> join(UserRequest.JoinDTO joinDTO){
+    public ResponseEntity<?> join(@RequestBody UserRequest.JoinDTO joinDTO){
         User savedUser = userService.join(joinDTO);
         if(savedUser != null && savedUser.getId()!=null){
             return ResponseEntity.ok(new ApiUtil<>(null)); //회원가입성공

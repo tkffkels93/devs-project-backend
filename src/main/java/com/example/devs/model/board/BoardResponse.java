@@ -2,6 +2,7 @@ package com.example.devs.model.board;
 
 import com.example.devs._core.enums.BoardStatus;
 import com.example.devs._core.utils.LocalDateTimeFormatter;
+import com.example.devs.model.reply.Reply;
 import lombok.Data;
 
 import java.util.List;
@@ -91,7 +92,7 @@ public class BoardResponse {
             this.userNickname = board.getUser().getNickname();
             this.userPosition = board.getUser().getPosition();
             this.userImage = board.getUser().getImage();
-            this.boardCreatedAt = board.getCreatedAt().toString();
+            this.boardCreatedAt = LocalDateTimeFormatter.convert( board.getCreatedAt() );
             this.boardCreatedAtDuration = LocalDateTimeFormatter.getDuration(board.getCreatedAt());
             this.myLike = false;
             this.myBookmark = false;
@@ -111,6 +112,7 @@ public class BoardResponse {
         private String userNickname;
         private String userPosition;
         private String userImage;
+        private Integer rank;
 
         public Top10ListDTO(Board board) {
             this.boardId = board.getId();
@@ -119,8 +121,74 @@ public class BoardResponse {
             this.userNickname = board.getUser().getNickname();
             this.userPosition = board.getUser().getPosition();
             this.userImage = board.getUser().getImage();
-            this.boardCreatedAt = board.getCreatedAt().toString();
+            this.boardCreatedAt = LocalDateTimeFormatter.convert( board.getCreatedAt() );
             this.boardCreatedAtDuration = LocalDateTimeFormatter.getDuration(board.getCreatedAt());
+            this.rank=0;
+        }
+    }
+
+    // 게시글 상세 보기
+    @Data
+    public static class DetailDTO {
+        private Integer boardId;
+        private String boardTitle;
+        private String boardContent;
+        private Integer boardHit;
+        private String boardCreatedAt;
+        private String boardCreatedAtDuration;
+        private Integer userId;
+        private String userNickname;
+        private String userPosition;
+        private String userImage;
+        private boolean myLike;
+        private boolean myBookmark;
+        private Long likeCount;
+        private Long bookmarkCount;
+        private Integer replyCount;
+        private List<ReplyDTO> replies;
+
+        public DetailDTO(Board board, List<ReplyDTO> replies) {
+            this.boardId = board.getId();
+            this.boardTitle = board.getTitle();
+            this.boardContent = board.getContent();
+            this.boardHit = board.getHit();
+            this.userId = board.getUser().getId();
+            this.userNickname = board.getUser().getNickname();
+            this.userPosition = board.getUser().getPosition();
+            this.userImage = board.getUser().getImage();
+            this.boardCreatedAt = LocalDateTimeFormatter.convert( board.getCreatedAt() );
+            this.boardCreatedAtDuration = LocalDateTimeFormatter.getDuration(board.getCreatedAt());
+            this.myLike = false;
+            this.myBookmark = false;
+            this.likeCount = 0L;
+            this.bookmarkCount = 0L;
+            this.replyCount = replies.size();
+            this.replies = replies;
+        }
+    }
+
+    @Data
+    public static class ReplyDTO{
+        private Integer id;
+        private Integer boardId; // Board
+        private Integer userId;
+        private String userNickname;
+        private String userPosition;
+        private String userImage;
+        private String comment; // 내용
+        private String updatedAt; // 수정일
+
+        public ReplyDTO(Reply reply) {
+            this.id = reply.getId();
+            this.boardId = reply.getBoard().getId();
+            this.userId = reply.getUser().getId();
+            this.userNickname = reply.getUser().getNickname();
+            this.userPosition = reply.getUser().getPosition();
+            this.userImage = reply.getUser().getImage();
+            this.comment = reply.getComment();
+            this.updatedAt = LocalDateTimeFormatter.convert(
+                    reply.getUpdatedAt() != null ? reply.getUpdatedAt() : reply.getCreatedAt()
+            );
         }
     }
 

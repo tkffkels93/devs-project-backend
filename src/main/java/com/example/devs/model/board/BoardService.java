@@ -8,6 +8,8 @@ import com.example.devs._core.errors.exception.Exception403;
 import com.example.devs._core.errors.exception.Exception404;
 import com.example.devs.model.bookmark.BookmarkService;
 import com.example.devs.model.like.LikeService;
+import com.example.devs.model.reply.ReplyRepository;
+import com.example.devs.model.reply.ReplyService;
 import com.example.devs.model.user.User;
 import com.example.devs.model.user.UserRepository;
 import jakarta.transaction.Transactional;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RequiredArgsConstructor
 @Service
@@ -26,6 +29,8 @@ public class BoardService {
     private final UserRepository userRepository;
     private final LikeService likeService;
     private final BookmarkService bookmarkService;
+    private final ReplyRepository replyRepository;
+    private final ReplyService replyService;
 
     //게시글 목록 불러오기 ( 일반 사용자용 )
     @Transactional
@@ -61,11 +66,27 @@ public class BoardService {
         return new PageImpl<>(boardDtoList, pageable, boards.getTotalElements());
     }
 
+    //게시글 내용 불러오기 ( 일반 사용자용 )
+    @Transactional
+    public BoardResponse.DetailDTO getBoardDetail(BoardRole boardRole, Integer boardId){
+        Board board = boardRepository.findByBoardRoleAndId(boardRole, boardId)
+                .orElseThrow(() -> new Exception404("게시물을 찾을 수 없습니다."));
+
+        List<BoardResponse.ReplyDTO> repliesDto = replyService.getReplies(boardRole, boardId);
+
+        return new BoardResponse.DetailDTO(board,repliesDto);
+    }
+
     //인기 게시글 목록(top10) 가져오기
     @Transactional
     public List<BoardResponse.Top10ListDTO> getTop10Boards(BoardRole boardRole){
         List<Board> boards =  boardRepository.findTop10ByBoardRole(boardRole);
-        return boards.stream().map(BoardResponse.Top10ListDTO::new).toList();
+        AtomicInteger counter = new AtomicInteger(1);
+        return boards.stream().map(board -> {
+            BoardResponse.Top10ListDTO dto = new BoardResponse.Top10ListDTO(board);
+            dto.setRank(counter.getAndIncrement());
+            return dto;
+        }).toList();
     }
 
 

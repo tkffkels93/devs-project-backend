@@ -8,10 +8,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -41,4 +38,11 @@ public class BoardRestController {
         List<BoardResponse.Top10ListDTO> boardList = boardService.getTop10Boards(BoardRole.Board);
         return ResponseEntity.ok(new ApiUtil<>(boardList));
     }
+
+    @GetMapping("/{boardId}/detail")
+    public ResponseEntity<?> boardDetail(HttpServletRequest request, @PathVariable Integer boardId) {
+        BoardResponse.DetailDTO dto = boardService.getBoardDetail(BoardRole.Board, boardId);
+        return ResponseEntity.ok(new ApiUtil<>(dto));
+    }
+
 }
