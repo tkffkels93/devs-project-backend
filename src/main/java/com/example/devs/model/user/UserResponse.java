@@ -6,6 +6,8 @@ import com.example.devs._core.utils.LocalDateTimeFormatter;
 import com.example.devs._core.utils.ScopeConverter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.sql.Timestamp;
@@ -168,4 +170,38 @@ public class UserResponse {
         private String accessToken;
         private String result;
     }
+
+    // 마이페이지
+    @Builder
+    @Data
+    public static class MypageDTO {
+        private Integer id;                    // PK
+        private String image;                  // 프로필 사진
+        private String nickname;               // 닉네임
+        private String position;               // 직함
+        private String introduce;              // 자기소개
+        private List<MyBoardList> myBoardList; // 내가 작성한 글
+        private List<MyReplyList> myReplyList; // 내가 작성한 댓글
+
+        // 내가 작성한 글
+        @AllArgsConstructor
+        @Builder
+        @Data
+        public static class MyBoardList {
+            private Integer id;       // PK
+            private String title;     // 제목
+            private String updatedAt; // 작성일
+        }
+
+        // 내가 작성한 댓글
+        @Builder
+        @Data
+        public static class MyReplyList {
+            private Integer id;        // PK
+            private String comment;    // 댓글 내용
+            private String boardTitle; // 댓글이 작성된 글 제목
+            private String updatedAt;  // 작성일
+        }
+    }
+
 }
