@@ -1,5 +1,6 @@
 package com.example.devs.model.bookmark;
 
+import com.example.devs._core.enums.BoardRole;
 import com.example.devs.model.board.Board;
 import com.example.devs.model.user.User;
 import jakarta.persistence.*;
@@ -24,6 +25,9 @@ public class Bookmark {
     @JoinColumn(name = "user_id")
     private User user; // User
 
+    @Enumerated(EnumType.STRING)
+    private BoardRole boardRole; // Board 구분
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private Board board; // Board
@@ -35,11 +39,10 @@ public class Bookmark {
     private LocalDateTime updatedAt; // 수정일
 
     @Builder
-    public Bookmark(Integer id, User user, Board board, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Bookmark(Integer id, User user, BoardRole boardRole, Board board) {
         this.id = id;
         this.user = user;
+        this.boardRole = boardRole;
         this.board = board;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 }

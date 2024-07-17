@@ -8,4 +8,5 @@ public interface OAuthLoginService<T> {
     UserProvider getProvider();
     UserResponse.OAuthTokenDTO getAccessToken(String authorizationCode);
     T getUserInfo(String accessToken);
+    T unlink(String providerId, String accessToken);
 }
