@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RequiredArgsConstructor
 @Service
@@ -65,7 +66,12 @@ public class BoardService {
     @Transactional
     public List<BoardResponse.Top10ListDTO> getTop10Boards(BoardRole boardRole){
         List<Board> boards =  boardRepository.findTop10ByBoardRole(boardRole);
-        return boards.stream().map(BoardResponse.Top10ListDTO::new).toList();
+        AtomicInteger counter = new AtomicInteger(10);
+        return boards.stream().map(board -> {
+            BoardResponse.Top10ListDTO dto = new BoardResponse.Top10ListDTO(board);
+            dto.setRank(counter.getAndDecrement());
+            return dto;
+        }).toList();
     }
 
 

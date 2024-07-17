@@ -91,7 +91,7 @@ public class BoardResponse {
             this.userNickname = board.getUser().getNickname();
             this.userPosition = board.getUser().getPosition();
             this.userImage = board.getUser().getImage();
-            this.boardCreatedAt = board.getCreatedAt().toString();
+            this.boardCreatedAt = LocalDateTimeFormatter.convert( board.getCreatedAt() );
             this.boardCreatedAtDuration = LocalDateTimeFormatter.getDuration(board.getCreatedAt());
             this.myLike = false;
             this.myBookmark = false;
@@ -111,6 +111,7 @@ public class BoardResponse {
         private String userNickname;
         private String userPosition;
         private String userImage;
+        private Integer rank;
 
         public Top10ListDTO(Board board) {
             this.boardId = board.getId();
@@ -119,8 +120,9 @@ public class BoardResponse {
             this.userNickname = board.getUser().getNickname();
             this.userPosition = board.getUser().getPosition();
             this.userImage = board.getUser().getImage();
-            this.boardCreatedAt = board.getCreatedAt().toString();
+            this.boardCreatedAt = LocalDateTimeFormatter.convert( board.getCreatedAt() );
             this.boardCreatedAtDuration = LocalDateTimeFormatter.getDuration(board.getCreatedAt());
+            this.rank=0;
         }
     }
 
