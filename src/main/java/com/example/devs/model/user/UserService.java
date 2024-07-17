@@ -10,14 +10,18 @@ import com.example.devs._core.errors.exception.Exception404;
 import com.example.devs._core.utils.EncryptUtil;
 import com.example.devs._core.utils.JwtUtil;
 import com.example.devs._core.utils.LocalDateTimeFormatter;
+import com.example.devs.model.board.Board;
+import com.example.devs.model.reply.Reply;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -264,4 +268,53 @@ public class UserService {
         // 사용자 데이터 삭제
         userRepository.deleteById(id);
     }
+
+    // 마이페이지
+    public UserResponse.MypageDTO getMyInfo(String jwt, Pageable pageable) {
+        // JWT에서 사용자 ID 추출
+        Integer id = JwtUtil.getUserIdFromJwt(jwt);
+
+        // 추출한 정보로 사용자 정보 조회하기
+        Optional<User> userOptional = userRepository.findById(id);
+        User user = userOptional.get();
+
+        // 내가 작성한 게시글 조회
+        List<Board> myBoards = userRepository.findMyBoardsById(id, pageable).getContent();
+
+        // 내가 작성한 댓글 조회
+        List<Reply> myReplies = userRepository.findMyRepliesById(id, pageable).getContent();
+
+        // 게시글 목록 변환
+        List<UserResponse.MypageDTO.MyBoardList> myBoardList = myBoards.stream()
+                .map(board -> new UserResponse.MypageDTO.MyBoardList(
+                        board.getId(),
+                        board.getTitle(),
+                        LocalDateTimeFormatter.getDuration(board.getCreatedAt()) // 날짜 변환
+                ))
+                .collect(Collectors.toList());
+
+        // 댓글 목록 변환
+        List<UserResponse.MypageDTO.MyReplyList> myReplyList = myReplies.stream()
+                .map(reply -> new UserResponse.MypageDTO.MyReplyList(
+                        reply.getId(),
+                        reply.getComment(),
+                        reply.getBoard().getTitle(),
+                        LocalDateTimeFormatter.getDuration(reply.getCreatedAt()) // 날짜 변환
+                ))
+                .collect(Collectors.toList());
+
+        // 조회한 정보 DTO에 담기
+        UserResponse.MypageDTO mypageDTO = UserResponse.MypageDTO.builder()
+                .id(user.getId())
+                .image(user.getImage())
+                .nickname(user.getNickname())
+                .position(user.getPosition())
+                .introduce(user.getIntroduce())
+                .myBoardList(myBoardList)
+                .myReplyList(myReplyList)
+                .build();
+
+        return mypageDTO;
+    }
+
 }

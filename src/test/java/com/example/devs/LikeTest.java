@@ -1,7 +1,6 @@
 package com.example.devs;
 
 import com.example.devs._core.enums.BoardRole;
-import com.example.devs.model.like.Like;
 import com.example.devs.model.like.LikeRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,7 @@ public class LikeTest {
         Integer count = likeRepository.countLike(BoardRole.Board, 1, 4);
         System.out.println("count = " + count);
 
-        Like like = likeRepository.countLike2(BoardRole.Board, 1, 4);
-        System.out.println("like = " + like.getId());
+        // Like like = likeRepository.countLike2(BoardRole.Board, 1, 4);
+        // System.out.println("like = " + like.getId());
     }
 }

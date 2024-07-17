@@ -4,6 +4,8 @@ import com.example.devs._core.enums.UserProvider;
 import com.example.devs._core.utils.ApiUtil;
 import com.example.devs._core.utils.JwtVO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,6 +40,7 @@ public class UserRestController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserRequest.LoginDTO loginDTO){
         String jwt = userService.login(loginDTO);
+        System.out.println("########### JWT ###########: " + jwt.toString());
         return ResponseEntity.ok()
                 .header(JwtVO.HEADER, JwtVO.PREFIX+ jwt)
                 .body(new ApiUtil<>(null)); // header 문법
@@ -52,5 +55,14 @@ public class UserRestController {
 
     }
 
+    // 마이페이지
+    @GetMapping("/mypage")
+    public ResponseEntity<?> getMyInfo(@RequestHeader("Authorization") String jwt,
+                                       @RequestParam(defaultValue = "1") Integer page,
+                                       @RequestParam(defaultValue = "10") Integer size) {
+        Pageable pageable = PageRequest.of(page - 1, size); // 클라이언트는 1부터 시작, 서버는 0부터 시작
+        UserResponse.MypageDTO mypageDTO = userService.getMyInfo(jwt, pageable);
+        return ResponseEntity.ok().body(new ApiUtil<>(mypageDTO));
+    }
 
 }
