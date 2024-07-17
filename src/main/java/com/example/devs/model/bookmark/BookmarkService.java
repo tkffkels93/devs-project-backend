@@ -28,7 +28,8 @@ public class BookmarkService {
                 .map(bookmark -> {
                     Integer loveCount = likeRepository.countByBoardId(bookmark.getBoard().getId(), BoardRole.Board, BoardStatus.PUBLISHED);
                     boolean isLove = likeRepository.existsByUserIdAndBoardId(userId, bookmark.getBoard().getId(), BoardRole.Board, BoardStatus.PUBLISHED);
-                    return new BookmarkResponse.BoardDTO(bookmark, loveCount, isLove);
+                    boolean isBookmark = bookmarkRepository.existsByUserIdAndBoardId(userId, bookmark.getId());
+                    return new BookmarkResponse.BoardDTO(bookmark, loveCount, isLove, isBookmark);
                 })
                 .collect(Collectors.toList());
 

@@ -36,9 +36,9 @@ public class BookmarkResponse {
         private Integer replyCount;  // 댓글 수
         private Integer loveCount; // 좋아요 수
         private boolean isLove;  // 좋아요 여부
-        private boolean isBookmark;  // 북마크 여부 (항상 true)
+        private boolean isBookmark;
 
-        public BoardDTO(Bookmark bookmark, Integer loveCount, boolean isLove) {
+        public BoardDTO(Bookmark bookmark, Integer loveCount, boolean isLove, boolean isBookmark) {
             this.userId = bookmark.getBoard().getUser().getId();
             this.userNickname = bookmark.getBoard().getUser().getNickname();
             this.userPosition = bookmark.getBoard().getUser().getPosition();
@@ -51,7 +51,7 @@ public class BookmarkResponse {
             this.replyCount = bookmark.getBoard().getReplies().size();
             this.loveCount = loveCount;
             this.isLove = isLove;
-            this.isBookmark = true; // 북마크는 항상 true
+            this.isBookmark = isBookmark;
         }
     }
 }
