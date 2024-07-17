@@ -34,10 +34,11 @@ public class BookmarkResponse {
         private Integer boardViews;  // 게시글 조회수
         private String boardCreatedAt;  // 게시글 생성일
         private Integer replyCount;  // 댓글 수
-        private boolean isLove;  // 좋아요 여부 (추후 로직 추가)
+        private Integer loveCount; // 좋아요 수
+        private boolean isLove;  // 좋아요 여부
         private boolean isBookmark;  // 북마크 여부 (항상 true)
 
-        public BoardDTO(Bookmark bookmark, boolean isLove) {
+        public BoardDTO(Bookmark bookmark, Integer loveCount, boolean isLove) {
             this.userId = bookmark.getBoard().getUser().getId();
             this.userNickname = bookmark.getBoard().getUser().getNickname();
             this.userPosition = bookmark.getBoard().getUser().getPosition();
@@ -48,6 +49,7 @@ public class BookmarkResponse {
             this.boardViews = bookmark.getBoard().getHit();
             this.boardCreatedAt = LocalDateTimeFormatter.getDuration(bookmark.getBoard().getCreatedAt());
             this.replyCount = bookmark.getBoard().getReplies().size();
+            this.loveCount = loveCount;
             this.isLove = isLove;
             this.isBookmark = true; // 북마크는 항상 true
         }
