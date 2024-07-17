@@ -174,7 +174,6 @@ public class BoardResponse {
         private Integer userId;
         private String userNickname;
         private String userPosition;
-        private String userIntroduce;
         private String userImage;
         private String comment; // 내용
         private String updatedAt; // 수정일
@@ -185,7 +184,6 @@ public class BoardResponse {
             this.userId = reply.getUser().getId();
             this.userNickname = reply.getUser().getNickname();
             this.userPosition = reply.getUser().getPosition();
-            this.userIntroduce = reply.getUser().getIntroduce();
             this.userImage = reply.getUser().getImage();
             this.comment = reply.getComment();
             this.updatedAt = LocalDateTimeFormatter.convert(
