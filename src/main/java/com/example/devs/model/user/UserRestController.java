@@ -3,6 +3,8 @@ package com.example.devs.model.user;
 import com.example.devs._core.enums.UserProvider;
 import com.example.devs._core.utils.ApiUtil;
 import com.example.devs._core.utils.JwtVO;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -57,11 +59,16 @@ public class UserRestController {
 
     // 마이페이지
     @GetMapping("/mypage")
-    public ResponseEntity<?> getMyInfo(@RequestHeader("Authorization") String jwt,
+    public ResponseEntity<?> getMyInfo(HttpServletRequest request,
                                        @RequestParam(defaultValue = "1") Integer page,
                                        @RequestParam(defaultValue = "10") Integer size) {
         Pageable pageable = PageRequest.of(page - 1, size); // 클라이언트는 1부터 시작, 서버는 0부터 시작
-        UserResponse.MypageDTO mypageDTO = userService.getMyInfo(jwt, pageable);
+
+        //현재 접속한 사용자 아이디 가져오기
+        HttpSession session = request.getSession();
+        SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
+
+        UserResponse.MypageDTO mypageDTO = userService.getMyInfo(sessionUser.getId(), pageable);
         return ResponseEntity.ok().body(new ApiUtil<>(mypageDTO));
     }
 
