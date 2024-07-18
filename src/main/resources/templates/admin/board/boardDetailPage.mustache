@@ -1,0 +1,86 @@
+{{> admin/layout/header}}
+<body>
+<main role="main">
+    <section id="section n1">
+        {{> admin/layout/sidebar}}
+        <div class="content-page">
+            <div class="content-tab-bar">
+                <div class="tab-content current">
+                    <div class="tab-head">
+                        <p>게시글 상세보기</p>
+                    </div>
+                    <div class="tab-item company info">
+                        <p class="tab-title">게시글 상세</p>
+                        <div class="room-tab_menu">
+                            <div class="cont_area">
+
+                                <div class="join-form-item">
+                                    <label for="name">게시글 등록 이미지 및 영상</label>
+                                    <div class="input-wrapper">
+                                        <div class="user-profile-image-box">
+                                            <img class="user-profile-image" src="/images/logo_devs.jpg"
+                                                 alt="게시글 이미지">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="join-form-item">
+                                    <label for="nickname">닉네임</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="nickname" value="{{boardDetail.nickname}}" disabled>
+                                    </div>
+                                </div>
+                                <div class="join-form-item">
+                                    <label for="title">제목</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="title" value="{{boardDetail.title}}" disabled>
+                                    </div>
+                                </div>
+                                <div class="join-form-item">
+                                    <label for="content">내용</label>
+                                    <div class="input-wrapper">
+                                        <textarea id="content" disabled>{{boardDetail.content}}</textarea>
+                                    </div>
+                                </div>
+                                <div class="join-form-item">
+                                    <label for="hit">조회수</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="hit" value="{{boardDetail.hit}}" disabled>
+                                    </div>
+                                </div>
+                                <div class="join-form-item">
+                                    <label for="status">게시글 상태</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="status" value="{{boardDetail.status}}" disabled>
+                                    </div>
+                                </div>
+                                <div class="join-form-item">
+                                    <label for="updated-at">마지막 작성 일자</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="updated-at" value="{{boardDetail.updatedAt}}"
+                                               disabled>
+                                    </div>
+                                </div>
+                                <div class="modal-button-wrapper">
+                                    <form action="/admin/boards/{{boardDetail.id}}/delete" method="post">
+                                        <button type="submit" class="btn red join">삭제</button>
+                                    </form>
+                                    <form action="/admin/boards/{{boardDetail.id}}/hide" method="post">
+                                        <button type="submit" class="btn refuse join">숨김</button>
+                                    </form>
+                                    <button type="button" class="btn black join"
+                                            onclick="history.back()">뒤로가기
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+
+</html>

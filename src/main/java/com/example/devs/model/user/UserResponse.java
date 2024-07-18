@@ -1,7 +1,5 @@
 package com.example.devs.model.user;
 
-import com.example.devs._core.enums.UserProvider;
-import com.example.devs._core.enums.UserStatus;
 import com.example.devs._core.utils.LocalDateTimeFormatter;
 import com.example.devs._core.utils.ScopeConverter;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -24,14 +22,14 @@ public class UserResponse {
         private String email;
         private String nickname;
         private String username;
-        private UserProvider provider;
+        private String provider;
 
         public AdminLoginDTO(User user) {
             this.id = user.getId();
             this.email = user.getEmail();
             this.nickname = user.getNickname();
             this.username = user.getUsername();
-            this.provider = user.getProvider();
+            this.provider = user.getProvider().getKorean();
         }
     }
 
@@ -53,16 +51,16 @@ public class UserResponse {
         private String email;
         private String username;
         private String nickname;
-        private UserProvider provider;
-        private UserStatus status;
+        private String provider;
+        private String status;
 
         public UserList(User user) {
             this.id = user.getId();
             this.email = user.getEmail();
             this.username = user.getUsername();
             this.nickname = user.getNickname();
-            this.provider = user.getProvider();
-            this.status = user.getStatus();
+            this.provider = user.getProvider().getKorean();
+            this.status = user.getStatus().getKorean();
         }
     }
 
@@ -74,10 +72,12 @@ public class UserResponse {
         private String username;
         private String nickname;
         private String phone;
+        private String position;
+        private String introduce;
         private LocalDate birth;
         private String image;
-        private UserProvider provider;
-        private UserStatus status;
+        private String provider;
+        private String status;
         private String createdAt;
         private String updatedAt;
 
@@ -87,10 +87,12 @@ public class UserResponse {
             this.username = user.getUsername();
             this.nickname = user.getNickname();
             this.phone = user.getPhone();
+            this.position = user.getPosition();
+            this.introduce = user.getIntroduce();
             this.birth = user.getBirth();
             this.image = user.getImage();
-            this.provider = user.getProvider();
-            this.status = user.getStatus();
+            this.provider = user.getProvider().getKorean();
+            this.status = user.getStatus().getKorean();
             this.createdAt = LocalDateTimeFormatter.convert(user.getCreatedAt());
             this.updatedAt = Optional.ofNullable(user.getUpdatedAt())
                     .map(LocalDateTimeFormatter::convert)
