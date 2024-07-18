@@ -270,19 +270,19 @@ public class UserService {
     }
 
     // 마이페이지
-    public UserResponse.MypageDTO getMyInfo(String jwt, Pageable pageable) {
+    public UserResponse.MypageDTO getMyInfo(Integer userId, Pageable pageable) {
         // JWT에서 사용자 ID 추출
-        Integer id = JwtUtil.getUserIdFromJwt(jwt);
+        // Integer id = JwtUtil.getUserIdFromJwt(jwt);
 
         // 추출한 정보로 사용자 정보 조회하기
-        Optional<User> userOptional = userRepository.findById(id);
+        Optional<User> userOptional = userRepository.findById(userId);
         User user = userOptional.get();
 
         // 내가 작성한 게시글 조회
-        List<Board> myBoards = userRepository.findMyBoardsById(id, pageable).getContent();
+        List<Board> myBoards = userRepository.findMyBoardsById(userId, pageable).getContent();
 
         // 내가 작성한 댓글 조회
-        List<Reply> myReplies = userRepository.findMyRepliesById(id, pageable).getContent();
+        List<Reply> myReplies = userRepository.findMyRepliesById(userId, pageable).getContent();
 
         // 게시글 목록 변환
         List<UserResponse.MypageDTO.MyBoardList> myBoardList = myBoards.stream()
