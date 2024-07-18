@@ -245,15 +245,15 @@ public class UserService {
     }
 
     // OAuth 계정 연결 해제
-    public void oauthUnlink(UserProvider userProvider, String jwt) {
+    public void oauthUnlink(UserProvider userProvider, Integer userId) {
         // 해당 OAuth 공급자에 대한 서비스 가져오기
         OAuthLoginService<?> oauthLoginService = getOAuthProvider(userProvider);
 
         // JWT에서 사용자 ID 추출
-        int id = JwtUtil.getUserIdFromJwt(jwt);
+        // int id = JwtUtil.getUserIdFromJwt(jwt);
 
         // 사용자 데이터 조회
-        Optional<User> user = userRepository.findById(id);
+        Optional<User> user = userRepository.findById(userId);
 
         // Provider ID 및 저장된 Access Token 가져오기
         String providerId = user.get().getProviderId();
@@ -266,7 +266,7 @@ public class UserService {
         accessTokenStorage.deleteToken(providerId);
 
         // 사용자 데이터 삭제
-        userRepository.deleteById(id);
+        userRepository.deleteById(userId);
     }
 
     // 마이페이지
