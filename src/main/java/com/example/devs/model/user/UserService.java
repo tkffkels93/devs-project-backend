@@ -11,9 +11,11 @@ import com.example.devs._core.utils.EncryptUtil;
 import com.example.devs._core.utils.JwtUtil;
 import com.example.devs._core.utils.LocalDateTimeFormatter;
 import com.example.devs.model.board.Board;
+import com.example.devs.model.board.BoardRepository;
 import com.example.devs.model.reply.Reply;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final BoardRepository boardRepository;
     private final List<OAuthLoginService> oAuthLoginServices;
     private final AccessTokenStorage accessTokenStorage;
 
@@ -319,12 +322,36 @@ public class UserService {
 
     // 사용자 프로필 조회
     public UserResponse.UserProfileDTO getUserProfile(Integer userId, Pageable pageable) {
-        // JWT 확인
-
         // User 조회
+        User user = userRepository.findById(userId).orElseThrow(() -> new Exception404("해당 사용자를 찾을 수 없습니다."));
 
-        // Board 조회
+        // Board 목록 조회
+        Page<Board> boards = boardRepository.findByUserId(userId, pageable);
 
-        return null;
+        // 작성한 게시글 수
+        Integer boardCount = boardRepository.findBoardCountByUserId(userId);
+
+        // Board 목록 DTO로 변환
+        List<UserResponse.UserProfileDTO.UserBoardList> boardList = boards.stream()
+                .map(board -> new UserResponse.UserProfileDTO.UserBoardList(
+                        board.getId(),
+                        board.getTitle(),
+                        board.getContent(),
+                        LocalDateTimeFormatter.getDuration(board.getCreatedAt()) // 날짜 변환
+                ))
+                .collect(Collectors.toList());
+
+        // UserProfileDTO로 변환
+        UserResponse.UserProfileDTO userProfileDTO = UserResponse.UserProfileDTO.builder()
+                .id(user.getId())
+                .image(user.getImage())
+                .nickname(user.getNickname())
+                .position(user.getPosition())
+                .introduce(user.getIntroduce())
+                .totalBoardCount(boardCount)
+                .userBoardList(boardList)
+                .build();
+
+        return userProfileDTO;
     }
 }

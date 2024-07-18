@@ -206,6 +206,7 @@ public class UserResponse {
 
     // 유저 프로필 DTO
     @Data
+    @Builder
     public static class UserProfileDTO {
         private Integer id;                                       // PK
         private String image;                                     // 프로필 사진
@@ -216,6 +217,7 @@ public class UserResponse {
         private List<UserProfileDTO.UserBoardList> userBoardList; // 내가 작성한 글
 
         @Data
+        @Builder
         public static class UserBoardList {
             private Integer id;       // PK
             private String title;     // 제목
