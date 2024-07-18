@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "user_tb")
 @Data
-@Builder
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,11 +32,11 @@ public class User {
 
     private String phone; // 연락처
 
+    private String position; // 직함
+
     private LocalDate birth; // 생년월일
 
     private String image; // 프로필 사진
-
-    private String position; // 직함
 
     private String introduce; //자기소개
 
@@ -59,16 +58,16 @@ public class User {
     private LocalDateTime updatedAt; // 수정일
 
     @Builder
-    public User(Integer id, String email, String password, String nickname, String username, String phone, LocalDate birth, String image, String position, String introduce, UserRole role, String providerId, UserProvider provider, UserStatus status, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public User(Integer id, String email, String password, String nickname, String username, String phone, String position, LocalDate birth, String image, String introduce, UserRole role, String providerId, UserProvider provider, UserStatus status, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.username = username;
         this.phone = phone;
+        this.position = position;
         this.birth = birth;
         this.image = image;
-        this.position = position;
         this.introduce = introduce;
         this.role = role;
         this.providerId = providerId;
