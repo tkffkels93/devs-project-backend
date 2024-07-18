@@ -6,9 +6,9 @@ import com.example.devs._core.utils.LocalDateTimeFormatter;
 import com.example.devs._core.utils.ScopeConverter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -113,6 +113,7 @@ public class UserResponse {
 
     // 카카오 전용 추가 토큰 정보 DTO
     @Data
+    @EqualsAndHashCode(callSuper = true)
     public static class KakaoTokenDTO extends OAuthTokenDTO {
         @JsonDeserialize(using = ScopeConverter.class)
         private List<String> scope;
@@ -129,7 +130,7 @@ public class UserResponse {
         private Properties properties;
 
         @Data
-        class Properties {
+        static class Properties {
             private String nickname;
             @JsonProperty("profile_image")
             private String profileImage;
@@ -148,7 +149,7 @@ public class UserResponse {
         private Response response;
 
         @Data
-        class Response {
+        static class Response {
             private String id;
             private String nickname;
             @JsonProperty("profile_image")
@@ -171,9 +172,9 @@ public class UserResponse {
         private String result;
     }
 
-    // 마이페이지
-    @Builder
+    // 마이페이지 DTO
     @Data
+    @Builder
     public static class MypageDTO {
         private Integer id;                    // PK
         private String image;                  // 프로필 사진
@@ -184,9 +185,8 @@ public class UserResponse {
         private List<MyReplyList> myReplyList; // 내가 작성한 댓글
 
         // 내가 작성한 글
-        @AllArgsConstructor
-        @Builder
         @Data
+        @Builder
         public static class MyBoardList {
             private Integer id;       // PK
             private String title;     // 제목
@@ -194,13 +194,35 @@ public class UserResponse {
         }
 
         // 내가 작성한 댓글
-        @Builder
         @Data
+        @Builder
         public static class MyReplyList {
             private Integer id;        // PK
             private String comment;    // 댓글 내용
             private String boardTitle; // 댓글이 작성된 글 제목
             private String updatedAt;  // 작성일
+        }
+    }
+
+    // 유저 프로필 DTO
+    @Data
+    @Builder
+    public static class UserProfileDTO {
+        private Integer id;                                       // PK
+        private String image;                                     // 프로필 사진
+        private String nickname;                                  // 닉네임
+        private String position;                                  // 직함
+        private String introduce;                                 // 자기소개
+        private Integer totalBoardCount;                          // 내가 작성한 글 개수
+        private List<UserProfileDTO.UserBoardList> userBoardList; // 내가 작성한 글
+
+        @Data
+        @Builder
+        public static class UserBoardList {
+            private Integer id;       // PK
+            private String title;     // 제목
+            private String content;   // 내용
+            private String createdAt; // 작성일
         }
     }
 

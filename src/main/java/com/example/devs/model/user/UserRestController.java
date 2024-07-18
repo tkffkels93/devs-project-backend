@@ -77,4 +77,13 @@ public class UserRestController {
         return ResponseEntity.ok().body(new ApiUtil<>(mypageDTO));
     }
 
+    // 사용자 프로필 조회
+    @GetMapping("/profile/{userId}")
+    public ResponseEntity<?> getUserProfile(@PathVariable Integer userId,
+                                            @RequestParam(defaultValue = "1") Integer page,
+                                            @RequestParam(defaultValue = "10") Integer size) {
+        Pageable pageable = PageRequest.of(page - 1, size); // 클라이언트는 1부터 시작, 서버는 0부터 시작
+        UserResponse.UserProfileDTO userProfileDTO = userService.getUserProfile(userId, pageable);
+        return ResponseEntity.ok().body(new ApiUtil<>(userProfileDTO));
+    }
 }

@@ -45,4 +45,12 @@ public interface BoardRepository extends JpaRepository<Board, Integer> {
             "WHERE b.BoardRole = :boardRole and b.id=:boardId " +
             "GROUP BY b")
     Optional<Board> findByBoardRoleAndId(@Param("boardRole") BoardRole boardRole, @Param("boardId") Integer boardId);
+
+    // 특정 사용자의 게시글 조회하기
+    @Query("SELECT b FROM Board b WHERE b.user.id = :userId ORDER BY b.createdAt DESC")
+    Page<Board> findByUserId(Integer userId, Pageable pageable);
+
+    // 특정 사용자의 게시글 수 조회
+    @Query("SELECT COUNT(b.id) FROM Board b WHERE b.user.id = :userId")
+    Integer findBoardCountByUserId(Integer userId);
 }
