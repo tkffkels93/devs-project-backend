@@ -81,7 +81,6 @@ public class BoardService {
 
         List<BoardResponse.ReplyDTO> repliesDto = replyService.getReplies(boardRole, boardId, userId);
         BoardResponse.DetailDTO dto = new BoardResponse.DetailDTO(board, repliesDto);
-        System.out.println(userId);
         dto.setOwner(
                 board.getUser().getId().equals(userId) //이 글의 작성자이면 true로 셋팅
         );
