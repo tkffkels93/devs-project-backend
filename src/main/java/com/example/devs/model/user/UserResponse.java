@@ -172,7 +172,7 @@ public class UserResponse {
         private String result;
     }
 
-    // 마이페이지
+    // 마이페이지 DTO
     @Data
     @Builder
     public static class MypageDTO {
@@ -201,6 +201,26 @@ public class UserResponse {
             private String comment;    // 댓글 내용
             private String boardTitle; // 댓글이 작성된 글 제목
             private String updatedAt;  // 작성일
+        }
+    }
+
+    // 유저 프로필 DTO
+    @Data
+    public static class UserProfileDTO {
+        private Integer id;                                       // PK
+        private String image;                                     // 프로필 사진
+        private String nickname;                                  // 닉네임
+        private String position;                                  // 직함
+        private String introduce;                                 // 자기소개
+        private Integer totalBoardCount;                          // 내가 작성한 글 개수
+        private List<UserProfileDTO.UserBoardList> userBoardList; // 내가 작성한 글
+
+        @Data
+        public static class UserBoardList {
+            private Integer id;       // PK
+            private String title;     // 제목
+            private String content;   // 내용
+            private String createdAt; // 작성일
         }
     }
 

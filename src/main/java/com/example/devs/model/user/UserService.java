@@ -317,4 +317,14 @@ public class UserService {
         return mypageDTO;
     }
 
+    // 사용자 프로필 조회
+    public UserResponse.UserProfileDTO getUserProfile(Integer userId, Pageable pageable) {
+        // JWT 확인
+
+        // User 조회
+
+        // Board 조회
+
+        return null;
+    }
 }
