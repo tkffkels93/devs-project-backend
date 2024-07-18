@@ -5,34 +5,34 @@ VALUES ('admin@gmail.com', '1234', 'admin', '관리자', '010-1234-5678', '1980-
         'ADMIN', 'EMAIL', 'ACTIVE', NOW(), null);
 
 -- 일반 사용자 계정 생성, 비밀번호는 암호화해서 저장된다 (1234)
-INSERT INTO user_tb (email, password, nickname, username, phone, position, birth, image, role, provider, status,
-                     created_at, updated_at)
-VALUES ('ssar@nate.com', '$2a$10$CluX5UWKeV5f5n4S1AIptO7sJOg.faRFeVaZHfSenxkSHFuRcS9Yu', 'ssar', '쌀', '010-1234-5678',
-        '선임 연구원', '1990-08-15', 'profile_basic.png',
+INSERT INTO user_tb (email, password, nickname, username, phone, position, introduce, birth, image, role, provider,
+                     status, created_at, updated_at)
+VALUES ('ssar@nate.com', '$2a$10$CluX5UWKeV5f5n4S1AIptO7sJOg.faRFeVaZHfSenxkSHFuRcS9Yu', 'ssar', '쌀',
+        '010-1234-5678', '선임 연구원', '반갑습니다!', '1990-08-15', '/images/profile_basic.png',
         'USER', 'EMAIL', 'ACTIVE', NOW(), null),
-       ('cos@nate.com', '$2a$10$CluX5UWKeV5f5n4S1AIptO7sJOg.faRFeVaZHfSenxkSHFuRcS9Yu', 'cos', '코스', '010-2345-6789',
-        '책임 연구원', '1991-04-25', 'profile_basic.png',
+       ('cos@nate.com', '$2a$10$CluX5UWKeV5f5n4S1AIptO7sJOg.faRFeVaZHfSenxkSHFuRcS9Yu', 'cos', '코스',
+        '010-2345-6789', '책임 연구원', '반갑습니다!', '1991-04-25', '/images/profile_basic.png',
         'USER', 'KAKAO', 'ACTIVE', NOW(), null),
-       ('love@nate.com', '$2a$10$CluX5UWKeV5f5n4S1AIptO7sJOg.faRFeVaZHfSenxkSHFuRcS9Yu', 'love', '러브', '010-3456-7890',
-        '선임 연구원', '1992-12-05', 'profile_basic.png',
+       ('love@nate.com', '$2a$10$CluX5UWKeV5f5n4S1AIptO7sJOg.faRFeVaZHfSenxkSHFuRcS9Yu', 'love', '러브',
+        '010-3456-7890', '선임 연구원', '반갑습니다!', '1992-12-05', '/images/profile_basic.png',
         'USER', 'NAVER', 'ACTIVE', NOW(), null),
        ('kimsaewoon@gmail.com', '$2a$10$CluX5UWKeV5f5n4S1AIptO7sJOg.faRFeVaZHfSenxkSHFuRcS9Yu', 'kimsaewoon', '김세운',
-        '과장', '010-4567-8901', '1984-06-20', 'profile_rlatpdns.png',
+        '010-4567-8901', '과장', '반갑습니다!', '1984-06-20', '/images/profile_rlatpdns.png',
         'USER', 'KAKAO', 'ACTIVE', NOW(), null),
        ('egdg7777@gmail.com', '$2a$10$CluX5UWKeV5f5n4S1AIptO7sJOg.faRFeVaZHfSenxkSHFuRcS9Yu', 'egdg7777', '하승진',
-        '팀장', '010-2649-1492', '1990-09-15', 'profile_gktmdwls.png',
+        '010-2649-1492', '팀장', '반갑습니다!', '1990-09-15', '/images/profile_gktmdwls.png',
         'USER', 'KAKAO', 'ACTIVE', NOW(), null),
        ('tkffkels93@gmail.com', '$2a$10$CluX5UWKeV5f5n4S1AIptO7sJOg.faRFeVaZHfSenxkSHFuRcS9Yu', 'tkffkels93', '김완준',
-        '대리', '010-5678-9012', '1995-02-10', 'profile_basic.png',
+        '010-5678-9012', '대리', '반갑습니다!', '1995-02-10', '/images/profile_basic.png',
         'USER', 'EMAIL', 'ACTIVE', NOW(), null),
        ('zeeq125@gmail.com', '$2a$10$CluX5UWKeV5f5n4S1AIptO7sJOg.faRFeVaZHfSenxkSHFuRcS9Yu', 'zeeq125', '김정수',
-        '대리', '010-6789-0123', '1996-10-30', 'profile_basic.png',
+        '010-6789-0123', '대리', '반갑습니다!', '1996-10-30', '/images/profile_basic.png',
         'USER', 'NAVER', 'ACTIVE', NOW(), null),
        ('junsik213@naver.com', '$2a$10$CluX5UWKeV5f5n4S1AIptO7sJOg.faRFeVaZHfSenxkSHFuRcS9Yu', 'junsik213', '임준식',
-        '팀장', '010-7890-1234', '1997-07-12', 'profile_basic.png',
+        '010-7890-1234', '팀장', '반갑습니다!', '1997-07-12', '/images/profile_basic.png',
         'USER', 'NAVER', 'ACTIVE', NOW(), null),
        ('ij0512@naver.com', '$2a$10$CluX5UWKeV5f5n4S1AIptO7sJOg.faRFeVaZHfSenxkSHFuRcS9Yu', 'ij0512', '공지영',
-        '주임', '010-8901-2345', '1998-03-22', 'profile_rhdwldud.jpg',
+        '010-8901-2345', '주임', '반갑습니다!', '1998-03-22', '/images/profile_rhdwldud.jpg',
         'USER', 'KAKAO', 'ACTIVE', NOW(), null);
 
 -- Board 엔터티용 더미 데이터 생성

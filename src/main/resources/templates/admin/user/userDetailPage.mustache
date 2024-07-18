@@ -1,0 +1,116 @@
+{{> admin/layout/header}}
+
+<body>
+<main role="main">
+    <section id="section n1">
+        {{> admin/layout/sidebar}}
+        <div class="content-page">
+            <div class="content-tab-bar">
+                <div class="tab-content current">
+                    <div class="tab-head">
+                        <p>회원 정보</p>
+                    </div>
+                    <div class="tab-item company info">
+                        <p class="tab-title">회원 정보</p>
+                        <div class="room-tab_menu">
+                            <div class="cont_area">
+
+                                <div class="join-form-item">
+                                    <label for="name">프로필 이미지</label>
+                                    <div class="input-wrapper">
+                                        <div class="user-profile-image-box">
+                                            <img class="user-profile-image" src="{{userDetail.image}}"
+                                                 alt="프로필 이미지">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="join-form-item">
+                                    <label for="name">이름</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="name" value="{{userDetail.username}}" disabled>
+                                    </div>
+                                </div>
+                                <div class="join-form-item">
+                                    <label for="email">이메일</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="email" value="{{userDetail.email}}" disabled>
+                                    </div>
+                                </div>
+                                <div class="join-form-item">
+                                    <label for="nickname">닉네임</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="nickname" value="{{userDetail.nickname}}" disabled>
+                                    </div>
+                                </div>
+                                <div class="join-form-item">
+                                    <label for="phone">연락처</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="phone" value="{{userDetail.phone}}" disabled>
+                                    </div>
+                                </div>
+                                <div class="join-form-item">
+                                    <label for="position">직함</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="position" value="{{userDetail.position}}" disabled>
+                                    </div>
+                                </div>
+                                <div class="join-form-item">
+                                    <label for="introduce">자기소개</label>
+                                    <div class="input-wrapper">
+                                        <textarea id="introduce" disabled>{{userDetail.introduce}}</textarea>
+                                    </div>
+                                </div>
+                                <div class="join-form-item">
+                                    <label for="birth">생년월일</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="birth" value="{{userDetail.birth}}" disabled>
+                                    </div>
+                                </div>
+                                <div class="join-form-item">
+                                    <label for="provider">프로바이더</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="provider" value="{{userDetail.provider}}" disabled>
+                                    </div>
+                                </div>
+                                <div class="join-form-item">
+                                    <label for="status">활동 상태</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="status" value="{{userDetail.status}}" disabled>
+                                    </div>
+                                </div>
+                                <div class="join-form-item">
+                                    <label for="created-at">가입 일자</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="created-at" value="{{userDetail.createdAt}}" disabled>
+                                    </div>
+                                </div>
+                                <div class="join-form-item">
+                                    <label for="updated-at">수정 일자</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="updated-at" value="{{userDetail.updatedAt}}" disabled>
+                                    </div>
+                                </div>
+                                <div class="modal-button-wrapper">
+                                    <form action="/admin/users/{{userDetail.id}}/delete" method="post">
+                                        <button type="submit" class="btn red join">삭제하기</button>
+                                    </form>
+                                    <form action="/admin/users/{{userDetail.id}}/block" method="post">
+                                        <button type="submit" class="btn refuse join">차단하기</button>
+                                    </form>
+                                    <button type="button" class="btn black join"
+                                            onclick="history.back()">뒤로가기
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+
+</html>

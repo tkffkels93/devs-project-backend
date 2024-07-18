@@ -1,0 +1,29 @@
+{{> admin/layout/header}}
+<body>
+<main role="main">
+    <div class="login-form">
+        <form action="/admin/login" method="post">
+            <div class="form-wrapper">
+                <figure>
+                    <img src="/images/logo_devs.png" alt="로고이미지">
+                </figure>
+                <p class="login-title">관리자 로그인</p>
+                <div class="input-wrapper">
+                    <label for="admin-id">아이디</label>
+                    <input type="text" id="admin-id" class="input" name="email" value="admin@gmail.com">
+                </div>
+                <div class="input-wrapper">
+                    <label for="admin-password">비밀번호</label>
+                    <input type="password" id="admin-password" name="password" value="1234">
+                </div>
+                <button class="btn orange">로그인</button>
+            </div>
+        </form>
+    </div>
+</main>
+<script>
+
+</script>
+</body>
+
+</html>
