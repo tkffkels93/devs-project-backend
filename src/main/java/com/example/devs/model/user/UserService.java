@@ -11,9 +11,11 @@ import com.example.devs._core.utils.EncryptUtil;
 import com.example.devs._core.utils.JwtUtil;
 import com.example.devs._core.utils.LocalDateTimeFormatter;
 import com.example.devs.model.board.Board;
+import com.example.devs.model.board.BoardRepository;
 import com.example.devs.model.reply.Reply;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final BoardRepository boardRepository;
     private final List<OAuthLoginService> oAuthLoginServices;
     private final AccessTokenStorage accessTokenStorage;
 
@@ -245,15 +248,15 @@ public class UserService {
     }
 
     // OAuth 계정 연결 해제
-    public void oauthUnlink(UserProvider userProvider, String jwt) {
+    public void oauthUnlink(UserProvider userProvider, Integer userId) {
         // 해당 OAuth 공급자에 대한 서비스 가져오기
         OAuthLoginService<?> oauthLoginService = getOAuthProvider(userProvider);
 
         // JWT에서 사용자 ID 추출
-        int id = JwtUtil.getUserIdFromJwt(jwt);
+        // int id = JwtUtil.getUserIdFromJwt(jwt);
 
         // 사용자 데이터 조회
-        Optional<User> user = userRepository.findById(id);
+        Optional<User> user = userRepository.findById(userId);
 
         // Provider ID 및 저장된 Access Token 가져오기
         String providerId = user.get().getProviderId();
@@ -266,23 +269,23 @@ public class UserService {
         accessTokenStorage.deleteToken(providerId);
 
         // 사용자 데이터 삭제
-        userRepository.deleteById(id);
+        userRepository.deleteById(userId);
     }
 
     // 마이페이지
-    public UserResponse.MypageDTO getMyInfo(String jwt, Pageable pageable) {
+    public UserResponse.MypageDTO getMyInfo(Integer userId, Pageable pageable) {
         // JWT에서 사용자 ID 추출
-        Integer id = JwtUtil.getUserIdFromJwt(jwt);
+        // Integer id = JwtUtil.getUserIdFromJwt(jwt);
 
         // 추출한 정보로 사용자 정보 조회하기
-        Optional<User> userOptional = userRepository.findById(id);
+        Optional<User> userOptional = userRepository.findById(userId);
         User user = userOptional.get();
 
         // 내가 작성한 게시글 조회
-        List<Board> myBoards = userRepository.findMyBoardsById(id, pageable).getContent();
+        List<Board> myBoards = userRepository.findMyBoardsById(userId, pageable).getContent();
 
         // 내가 작성한 댓글 조회
-        List<Reply> myReplies = userRepository.findMyRepliesById(id, pageable).getContent();
+        List<Reply> myReplies = userRepository.findMyRepliesById(userId, pageable).getContent();
 
         // 게시글 목록 변환
         List<UserResponse.MypageDTO.MyBoardList> myBoardList = myBoards.stream()
@@ -317,4 +320,38 @@ public class UserService {
         return mypageDTO;
     }
 
+    // 사용자 프로필 조회
+    public UserResponse.UserProfileDTO getUserProfile(Integer userId, Pageable pageable) {
+        // User 조회
+        User user = userRepository.findById(userId).orElseThrow(() -> new Exception404("해당 사용자를 찾을 수 없습니다."));
+
+        // Board 목록 조회
+        Page<Board> boards = boardRepository.findByUserId(userId, pageable);
+
+        // 작성한 게시글 수
+        Integer boardCount = boardRepository.findBoardCountByUserId(userId);
+
+        // Board 목록 DTO로 변환
+        List<UserResponse.UserProfileDTO.UserBoardList> boardList = boards.stream()
+                .map(board -> new UserResponse.UserProfileDTO.UserBoardList(
+                        board.getId(),
+                        board.getTitle(),
+                        board.getContent(),
+                        LocalDateTimeFormatter.getDuration(board.getCreatedAt()) // 날짜 변환
+                ))
+                .collect(Collectors.toList());
+
+        // UserProfileDTO로 변환
+        UserResponse.UserProfileDTO userProfileDTO = UserResponse.UserProfileDTO.builder()
+                .id(user.getId())
+                .image(user.getImage())
+                .nickname(user.getNickname())
+                .position(user.getPosition())
+                .introduce(user.getIntroduce())
+                .totalBoardCount(boardCount)
+                .userBoardList(boardList)
+                .build();
+
+        return userProfileDTO;
+    }
 }

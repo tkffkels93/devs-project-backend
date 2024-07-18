@@ -1,0 +1,79 @@
+{{> admin/layout/header}}
+
+<body>
+<main role="main">
+    <section id="section n1">
+        {{> admin/layout/sidebar}}
+        <div class="content-page">
+            <div class="content-tab-bar">
+                <ul class="tab-nav">
+                    <li class="tab-link current"><a href="/admin/users">회원</a></li>
+                    <li class="tab-link"><a href="/admin/boards">게시글</a></li>
+                    <li class="tab-link"><a href="/admin/qna-list">문의</a></li>
+                    <li class="tab-link"><a href="/admin/report-list">신고</a></li>
+                    <li class="tab-link"><a href="/admin/notice-list">공지사항</a></li>
+                </ul>
+                <div class="tab-content current">
+                    <div class="tab-head">
+                        <p>회원 목록</p>
+                    </div>
+                    <div class="tab-item">
+                        <form action="/admin/users" method="get" style="width: 100%;">
+                            <ul class="search-box">
+                                <li class="search-left">
+                                    <span>총 회원 <em>{{userListDTO.totalUserCount}}</em> 명</span>
+                                </li>
+                                <li class="search-right">
+                                    <div>
+                                        <div class="tab-input-wrapper">
+                                            <input class="input-id" type="text" name="keyword" placeholder="검색어 입력">
+                                            <input class="submit-btn" type="submit" value="Search">
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </form>
+                        <table>
+                            <colgroup>
+                                <col width="20%">
+                                <col width="20%">
+                                <col width="20%">
+                                <col width="20%">
+                                <col width="20%">
+                            </colgroup>
+                            <thead>
+                            <tr>
+                                <th scope="col">회원명</th>
+                                <th scope="col">이메일</th>
+                                <th scope="col">닉네임</th>
+                                <th scope="col">프로바이더</th>
+                                <th scope="col">회원상태</th>
+                                <th scope="col">상세보기</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            {{#userListDTO.userList}}
+                                <tr>
+                                    <td class="title">{{username}}</td>
+                                    <td>{{email}}</td>
+                                    <td>{{nickname}}</td>
+                                    <td>{{provider}}</td>
+                                    <td>{{status}}</td>
+                                    <td><span class="detail"
+                                              onclick="location.href='/admin/users/{{id}}'">상세보기</span>
+                                    </td>
+                                </tr>
+                            {{/userListDTO.userList}}
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+
+</html>
