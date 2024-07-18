@@ -141,6 +141,7 @@ public class BoardResponse {
         private String userImage;
         private boolean myLike;
         private boolean myBookmark;
+        private boolean isOwner;
         private Long likeCount;
         private Long bookmarkCount;
         private Integer replyCount;
@@ -159,6 +160,7 @@ public class BoardResponse {
             this.boardCreatedAtDuration = LocalDateTimeFormatter.getDuration(board.getCreatedAt());
             this.myLike = false;
             this.myBookmark = false;
+            this.isOwner = false;
             this.likeCount = 0L;
             this.bookmarkCount = 0L;
             this.replyCount = replies.size();
@@ -176,6 +178,7 @@ public class BoardResponse {
         private String userImage;
         private String comment; // 내용
         private String updatedAt; // 수정일
+        private boolean isOwner;
 
         public ReplyDTO(Reply reply) {
             this.id = reply.getId();
@@ -188,6 +191,7 @@ public class BoardResponse {
             this.updatedAt = LocalDateTimeFormatter.convert(
                     reply.getUpdatedAt() != null ? reply.getUpdatedAt() : reply.getCreatedAt()
             );
+            this.isOwner = false;
         }
     }
 
