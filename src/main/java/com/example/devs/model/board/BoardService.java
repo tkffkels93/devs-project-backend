@@ -40,7 +40,6 @@ public class BoardService {
     private final PhotoService photoService;
 
     //게시글 목록 불러오기 ( 일반 사용자용 )
-    @Transactional
     public Page<BoardResponse.ListDTO> getBoards(int page, int size, BoardRole boardRole, Integer userId) {
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable = PageRequest.of(page, size, sort);
@@ -70,7 +69,6 @@ public class BoardService {
     }
 
     //게시글 내용 불러오기 ( 일반 사용자용 )
-    @Transactional
     public BoardResponse.DetailDTO getBoardDetail(BoardRole boardRole, Integer boardId, Integer userId) {
         Board board = boardRepository.findByBoardRoleAndId(boardRole, boardId)
                 .orElseThrow(() -> new Exception404("게시물을 찾을 수 없습니다."));
@@ -90,7 +88,6 @@ public class BoardService {
     }
 
     //인기 게시글 목록(top10) 가져오기
-    @Transactional
     public List<BoardResponse.Top10ListDTO> getTop10Boards(BoardRole boardRole) {
         List<Board> boards = boardRepository.findTop10ByBoardRole(boardRole);
         AtomicInteger counter = new AtomicInteger(1);
@@ -206,7 +203,7 @@ public class BoardService {
                 String uuidFileName = UUID.randomUUID().toString() + fileExtension;
 
                 // 저장할 디렉토리 경로 설정
-                String directoryPath = "/upload/";
+                String directoryPath = "./upload/";
                 File directory = new File(directoryPath);
                 if (!directory.exists()) {
                     directory.mkdirs(); // 디렉토리가 존재하지 않으면 생성
@@ -220,11 +217,14 @@ public class BoardService {
                     throw new IOException("Failed to save image: " + originalFileName, e);
                 }
 
+
+                String filePath2 = "/upload/" + uuidFileName;
+                
                 //2
                 Photo photo = Photo.builder()
                         .board(board)
                         .fileName(uuidFileName)
-                        .filePath(filePath)
+                        .filePath(filePath2)
                         .build();
                 photoService.savePhoto(photo);
             }

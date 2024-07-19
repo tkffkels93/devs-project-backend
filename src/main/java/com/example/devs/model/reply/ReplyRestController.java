@@ -16,9 +16,9 @@ public class ReplyRestController {
 
     // 댓글 작성
     @PostMapping("/{boardId}")
-    public ResponseEntity<?> createReply(@PathVariable Integer boardId, @RequestBody String comment) {
+    public ResponseEntity<?> createReply(@PathVariable Integer boardId, @RequestBody ReplyRequest.ReplySaveDTO reqDTO) {
         SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
-        replyService.createReply(sessionUser.getId(), boardId, comment);
+        replyService.createReply(sessionUser.getId(), boardId, reqDTO);
         return ResponseEntity.ok(new ApiUtil<>("댓글 작성 성공"));
     }
 
