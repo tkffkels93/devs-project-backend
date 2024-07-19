@@ -32,7 +32,7 @@ public class Board {
 
     private String title; // 제목
 
-    @Column(length = 1000) // 여기서 content 필드의 길이를 1000으로 설정합니다.
+    @Column(length = 10000) // 여기서 content 필드의 길이를 1000으로 설정합니다.
     private String content; // 내용
 
     private Integer hit; // 조회수
