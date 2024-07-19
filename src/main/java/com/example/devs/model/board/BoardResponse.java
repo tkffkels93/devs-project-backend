@@ -1,6 +1,7 @@
 package com.example.devs.model.board;
 
 import com.example.devs._core.utils.LocalDateTimeFormatter;
+import com.example.devs.model.photo.Photo;
 import com.example.devs.model.reply.Reply;
 import lombok.Data;
 
@@ -146,8 +147,9 @@ public class BoardResponse {
         private Long bookmarkCount;
         private Integer replyCount;
         private List<ReplyDTO> replies;
+        private List<PhotoDTO> images;
 
-        public DetailDTO(Board board, List<ReplyDTO> replies) {
+        public DetailDTO(Board board, List<ReplyDTO> replies, List<PhotoDTO> images) {
             this.boardId = board.getId();
             this.boardTitle = board.getTitle();
             this.boardContent = board.getContent();
@@ -165,6 +167,7 @@ public class BoardResponse {
             this.bookmarkCount = 0L;
             this.replyCount = replies.size();
             this.replies = replies;
+            this.images = images;
         }
     }
 
@@ -192,6 +195,19 @@ public class BoardResponse {
                     reply.getUpdatedAt() != null ? reply.getUpdatedAt() : reply.getCreatedAt()
             );
             this.isOwner = false;
+        }
+    }
+
+    @Data
+    public static class PhotoDTO{
+        private Integer id;
+        private String fileName;
+        private String filePath;
+
+        public PhotoDTO(Photo photo) {
+            this.id = photo.getId();
+            this.fileName = photo.getFileName();
+            this.filePath = photo.getFilePath();
         }
     }
 
