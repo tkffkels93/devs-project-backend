@@ -41,8 +41,10 @@ public class BoardRestController {
     }
 
     @GetMapping("/{boardId}/detail")
-    public ResponseEntity<?> boardDetail(@PathVariable Integer boardId) {
-        BoardResponse.DetailDTO dto = boardService.getBoardDetail(BoardRole.Board, boardId);
+    public ResponseEntity<?> boardDetail(HttpServletRequest request, @PathVariable Integer boardId) {
+        HttpSession session = request.getSession();
+        SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
+        BoardResponse.DetailDTO dto = boardService.getBoardDetail(BoardRole.Board, boardId, sessionUser.getId());
         return ResponseEntity.ok(new ApiUtil<>(dto));
     }
 
@@ -50,7 +52,6 @@ public class BoardRestController {
     public ResponseEntity<?> boardWrite(HttpServletRequest request, @RequestBody BoardRequest.Write writeDto) throws IOException {
         HttpSession session = request.getSession();
         SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
-        System.out.println("sessionUser.getId() = " + sessionUser.getId());
         boardService.writeBoard(sessionUser.getId(),writeDto);
         return ResponseEntity.ok(new ApiUtil<>(null));
     }

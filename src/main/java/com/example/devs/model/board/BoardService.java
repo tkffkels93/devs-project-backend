@@ -59,14 +59,10 @@ public class BoardService {
             dto.setLikeCount(likeCount);
             dto.setBookmarkCount(bookmarkCount);
             dto.setReplyCount(replyCount);
-            if (board.getUser().getId().equals(userId)) {
-                //좋아요 눌렀는지 확인 ( db에서 count가 1 이상이면 )
-                Integer myLikeCount = likeService.getLikeCount(boardRole, board.getId(), userId);
-                Integer myBookmarkCount = bookmarkService.getBookmarkCount(boardRole, board.getId(), userId);
-
-                //myLike와 myBookmark를 true로 설정한다 (기본값은 false)
-                dto.setMyLike(myLikeCount != null && myLikeCount > 0);
-                dto.setMyBookmark(myBookmarkCount != null && myBookmarkCount > 0);
+            if (board.getUser().getId().equals(userId)) { //이 게시글이 내가 쓴 글이면
+                //좋아요 눌렀는지 확인 후 true/false 설정
+                dto.setMyLike( likeService.isLiked(boardRole, board.getId(), userId) );
+                dto.setMyBookmark( bookmarkService.isBookmarked(boardRole, board.getId(), userId) );
             }
             boardDtoList.add(dto);
         }
@@ -75,14 +71,22 @@ public class BoardService {
 
     //게시글 내용 불러오기 ( 일반 사용자용 )
     @Transactional
-    public BoardResponse.DetailDTO getBoardDetail(BoardRole boardRole, Integer boardId) {
+    public BoardResponse.DetailDTO getBoardDetail(BoardRole boardRole, Integer boardId, Integer userId) {
         Board board = boardRepository.findByBoardRoleAndId(boardRole, boardId)
                 .orElseThrow(() -> new Exception404("게시물을 찾을 수 없습니다."));
-        //조회수 증가
-        board.setHit( board.getHit() +1 );
-        List<BoardResponse.ReplyDTO> repliesDto = replyService.getReplies(boardRole, boardId);
+        //조회수 증가 --> 본인이 작성한 글을 조회하는 경우에는 조회수가 증가하지 않음
+        if (!board.getUser().getId().equals(userId)) {
+            board.setHit( board.getHit() + 1 );
+        }
 
-        return new BoardResponse.DetailDTO(board, repliesDto);
+        //댓글 가져오기&이미지 가져오기
+        List<BoardResponse.ReplyDTO> repliesDto = replyService.getReplies(boardRole, boardId, userId);
+        List<BoardResponse.PhotoDTO> photoDTOs = photoService.getPhotos(boardId);
+        BoardResponse.DetailDTO dto = new BoardResponse.DetailDTO(board, repliesDto, photoDTOs);
+        dto.setOwner(
+                board.getUser().getId().equals(userId) //이 글의 작성자이면 true로 셋팅
+        );
+        return dto;
     }
 
     //인기 게시글 목록(top10) 가져오기

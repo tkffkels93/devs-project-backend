@@ -1,7 +1,7 @@
 package com.example.devs.model.board;
 
-import com.example.devs._core.enums.BoardStatus;
 import com.example.devs._core.utils.LocalDateTimeFormatter;
+import com.example.devs.model.photo.Photo;
 import com.example.devs.model.reply.Reply;
 import lombok.Data;
 
@@ -27,14 +27,14 @@ public class BoardResponse {
         private Integer id;
         private String nickname;
         private String title;
-        private BoardStatus status;
+        private String status;
         private String updatedAt;
 
         public BoardList(Board board) {
             this.id = board.getId();
             this.nickname = board.getUser().getNickname();
             this.title = board.getTitle();
-            this.status = board.getStatus();
+            this.status = board.getStatus().getKorean();
             this.updatedAt = LocalDateTimeFormatter.convert(
                     board.getUpdatedAt() != null ? board.getUpdatedAt() : board.getCreatedAt()
             );
@@ -49,7 +49,7 @@ public class BoardResponse {
         private String title;
         private String content;
         private Integer hit;
-        private BoardStatus status;
+        private String status;
         private String updatedAt;
 
         public BoardDetailDTO(Board board) {
@@ -58,7 +58,7 @@ public class BoardResponse {
             this.title = board.getTitle();
             this.content = board.getContent();
             this.hit = board.getHit();
-            this.status = board.getStatus();
+            this.status = board.getStatus().getKorean();
             this.updatedAt = LocalDateTimeFormatter.convert(
                     board.getUpdatedAt() != null ? board.getUpdatedAt() : board.getCreatedAt()
             );
@@ -66,7 +66,7 @@ public class BoardResponse {
     }
 
     @Data
-    public static class ListDTO{
+    public static class ListDTO {
         private Integer boardId;
         private String boardTitle;
         private String boardContent;
@@ -92,7 +92,7 @@ public class BoardResponse {
             this.userNickname = board.getUser().getNickname();
             this.userPosition = board.getUser().getPosition();
             this.userImage = board.getUser().getImage();
-            this.boardCreatedAt = LocalDateTimeFormatter.convert( board.getCreatedAt() );
+            this.boardCreatedAt = LocalDateTimeFormatter.convert(board.getCreatedAt());
             this.boardCreatedAtDuration = LocalDateTimeFormatter.getDuration(board.getCreatedAt());
             this.myLike = false;
             this.myBookmark = false;
@@ -103,7 +103,7 @@ public class BoardResponse {
     }
 
     @Data
-    public static class Top10ListDTO{
+    public static class Top10ListDTO {
         private Integer boardId;
         private String boardTitle;
         private String boardCreatedAt;
@@ -121,9 +121,9 @@ public class BoardResponse {
             this.userNickname = board.getUser().getNickname();
             this.userPosition = board.getUser().getPosition();
             this.userImage = board.getUser().getImage();
-            this.boardCreatedAt = LocalDateTimeFormatter.convert( board.getCreatedAt() );
+            this.boardCreatedAt = LocalDateTimeFormatter.convert(board.getCreatedAt());
             this.boardCreatedAtDuration = LocalDateTimeFormatter.getDuration(board.getCreatedAt());
-            this.rank=0;
+            this.rank = 0;
         }
     }
 
@@ -142,12 +142,14 @@ public class BoardResponse {
         private String userImage;
         private boolean myLike;
         private boolean myBookmark;
+        private boolean isOwner;
         private Long likeCount;
         private Long bookmarkCount;
         private Integer replyCount;
         private List<ReplyDTO> replies;
+        private List<PhotoDTO> images;
 
-        public DetailDTO(Board board, List<ReplyDTO> replies) {
+        public DetailDTO(Board board, List<ReplyDTO> replies, List<PhotoDTO> images) {
             this.boardId = board.getId();
             this.boardTitle = board.getTitle();
             this.boardContent = board.getContent();
@@ -156,19 +158,21 @@ public class BoardResponse {
             this.userNickname = board.getUser().getNickname();
             this.userPosition = board.getUser().getPosition();
             this.userImage = board.getUser().getImage();
-            this.boardCreatedAt = LocalDateTimeFormatter.convert( board.getCreatedAt() );
+            this.boardCreatedAt = LocalDateTimeFormatter.convert(board.getCreatedAt());
             this.boardCreatedAtDuration = LocalDateTimeFormatter.getDuration(board.getCreatedAt());
             this.myLike = false;
             this.myBookmark = false;
+            this.isOwner = false;
             this.likeCount = 0L;
             this.bookmarkCount = 0L;
             this.replyCount = replies.size();
             this.replies = replies;
+            this.images = images;
         }
     }
 
     @Data
-    public static class ReplyDTO{
+    public static class ReplyDTO {
         private Integer id;
         private Integer boardId; // Board
         private Integer userId;
@@ -177,6 +181,7 @@ public class BoardResponse {
         private String userImage;
         private String comment; // 내용
         private String updatedAt; // 수정일
+        private boolean isOwner;
 
         public ReplyDTO(Reply reply) {
             this.id = reply.getId();
@@ -189,6 +194,20 @@ public class BoardResponse {
             this.updatedAt = LocalDateTimeFormatter.convert(
                     reply.getUpdatedAt() != null ? reply.getUpdatedAt() : reply.getCreatedAt()
             );
+            this.isOwner = false;
+        }
+    }
+
+    @Data
+    public static class PhotoDTO{
+        private Integer id;
+        private String fileName;
+        private String filePath;
+
+        public PhotoDTO(Photo photo) {
+            this.id = photo.getId();
+            this.fileName = photo.getFileName();
+            this.filePath = photo.getFilePath();
         }
     }
 

@@ -32,10 +32,15 @@ public class UserRestController {
     }
     // OAuth 연동 해제
     @PostMapping("/unlink/{provider}")
-    public ResponseEntity<?> oauthUnlink(@PathVariable("provider") String provider, @RequestHeader("Authorization") String jwt){
+    public ResponseEntity<?> oauthUnlink(HttpServletRequest request, @PathVariable("provider") String provider){
         UserProvider userProvider;
         userProvider = UserProvider.valueOf(provider.toUpperCase());
-        userService.oauthUnlink(userProvider, jwt);
+
+        //현재 접속한 사용자 아이디 가져오기
+        HttpSession session = request.getSession();
+        SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
+
+        userService.oauthUnlink(userProvider, sessionUser.getId());
         return ResponseEntity.ok().body(new ApiUtil<>(null));
     }
 
@@ -72,4 +77,13 @@ public class UserRestController {
         return ResponseEntity.ok().body(new ApiUtil<>(mypageDTO));
     }
 
+    // 사용자 프로필 조회
+    @GetMapping("/profile/{userId}")
+    public ResponseEntity<?> getUserProfile(@PathVariable Integer userId,
+                                            @RequestParam(defaultValue = "1") Integer page,
+                                            @RequestParam(defaultValue = "10") Integer size) {
+        Pageable pageable = PageRequest.of(page - 1, size); // 클라이언트는 1부터 시작, 서버는 0부터 시작
+        UserResponse.UserProfileDTO userProfileDTO = userService.getUserProfile(userId, pageable);
+        return ResponseEntity.ok().body(new ApiUtil<>(userProfileDTO));
+    }
 }
