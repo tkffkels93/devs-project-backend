@@ -226,4 +226,32 @@ public class BoardService {
             photoService.savePhoto(photo);
         }
     }
+
+    // 검색한 게시판
+    public Page<BoardResponse.SearchBoardListDTO> getBoardsBySearch(Pageable pageable, BoardRole boardRole, Integer userId, String query) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+
+        Page<Object[]> boards = boardRepository.findBoardByQuery(pageable, boardRole, query);
+        List<Object[]> boardList = boards.getContent();
+        List<BoardResponse.SearchBoardListDTO> boardDtoList = new ArrayList<>();
+
+        for (Object[] result : boardList) {
+            Board board = (Board) result[0];
+            Long likeCount = (Long) result[1];
+            Long bookmarkCount = (Long) result[2];
+            Long replyCount = (Long) result[3];
+            BoardResponse.SearchBoardListDTO dto = new BoardResponse.SearchBoardListDTO(board);
+            //좋아요와 북마크 개수를 셋팅한다
+            dto.setLikeCount(likeCount);
+            dto.setBookmarkCount(bookmarkCount);
+            dto.setReplyCount(replyCount);
+            if (board.getUser().getId().equals(userId)) { //이 게시글이 내가 쓴 글이면
+                //좋아요 눌렀는지 확인 후 true/false 설정
+                dto.setMyLike( likeService.isLiked(boardRole, board.getId(), userId) );
+                dto.setMyBookmark( bookmarkService.isBookmarked(boardRole, board.getId(), userId) );
+            }
+            boardDtoList.add(dto);
+        }
+        return new PageImpl<>(boardDtoList, pageable, boards.getTotalElements());
+    }
 }

@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,6 +56,26 @@ public class BoardRestController {
         SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
         boardService.writeBoard(sessionUser.getId(),writeDto);
         return ResponseEntity.ok(new ApiUtil<>(null));
+    }
+
+    // 게시글 검색
+    @GetMapping("/search")
+    public ResponseEntity<?> getSearchBoard(HttpServletRequest request,
+                                            @RequestParam String query,
+                                            @RequestParam(defaultValue = "1") int page,
+                                            @RequestParam(defaultValue = "10") int size,
+                                            @RequestParam(defaultValue = "Board") BoardRole boardRole){
+        Pageable pageable = PageRequest.of(page - 1, size); // 클라이언트는 1부터 시작, 서버는 0부터 시작
+        //현재 접속한 사용자 아이디 가져오기
+        HttpSession session = request.getSession();
+        SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
+
+        if (query.isEmpty()){
+            return ResponseEntity.badRequest().body(new ApiUtil<>(404, "검색어를 입력해주세요."));
+        }
+
+        Page<BoardResponse.SearchBoardListDTO> boardList = boardService.getBoardsBySearch(pageable , boardRole, sessionUser.getId(), query);
+        return ResponseEntity.ok(new ApiUtil<>(boardList));
     }
 
 }

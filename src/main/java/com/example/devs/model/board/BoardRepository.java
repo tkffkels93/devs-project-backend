@@ -53,4 +53,17 @@ public interface BoardRepository extends JpaRepository<Board, Integer> {
     // 특정 사용자의 게시글 수 조회
     @Query("SELECT COUNT(b.id) FROM Board b WHERE b.user.id = :userId")
     Integer findBoardCountByUserId(Integer userId);
+
+    // 검색한 게시글
+    @Query("""
+       SELECT b, COUNT(DISTINCT l.id), COUNT(DISTINCT k.id), COUNT(DISTINCT r.id)
+       FROM Board b
+       LEFT JOIN Like l ON b.id = l.board.id AND l.boardRole = :boardRole
+       LEFT JOIN Bookmark k ON b.id = k.board.id AND k.boardRole = :boardRole
+       LEFT JOIN Reply r ON b.id = r.board.id AND r.boardRole = :boardRole
+       WHERE b.BoardRole = :boardRole AND b.title LIKE %:query%
+       GROUP BY b
+       ORDER BY b.id DESC
+       """)
+    Page<Object[]> findBoardByQuery(Pageable pageable, @Param("boardRole") BoardRole boardRole, @Param("query") String query);
 }

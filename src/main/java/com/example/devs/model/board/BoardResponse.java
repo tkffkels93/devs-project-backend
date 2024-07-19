@@ -211,4 +211,41 @@ public class BoardResponse {
         }
     }
 
+    // 검색한 게시판
+    @Data
+    public static class SearchBoardListDTO {
+        private Integer boardId;
+        private String boardTitle;
+        private String boardContent;
+        private Integer boardHit;
+        private String boardCreatedAt;
+        private String boardCreatedAtDuration;
+        private Integer userId;
+        private String userNickname;
+        private String userPosition;
+        private String userImage;
+        private boolean myLike;
+        private boolean myBookmark;
+        private Long likeCount;
+        private Long bookmarkCount;
+        private Long replyCount;
+
+        public  SearchBoardListDTO(Board board) {
+            this.boardId = board.getId();
+            this.boardTitle = board.getTitle();
+            this.boardContent = board.getContent();
+            this.boardHit = board.getHit();
+            this.userId = board.getUser().getId();
+            this.userNickname = board.getUser().getNickname();
+            this.userPosition = board.getUser().getPosition();
+            this.userImage = board.getUser().getImage();
+            this.boardCreatedAt = LocalDateTimeFormatter.convert(board.getCreatedAt());
+            this.boardCreatedAtDuration = LocalDateTimeFormatter.getDuration(board.getCreatedAt());
+            this.myLike = false;
+            this.myBookmark = false;
+            this.likeCount = 0L;
+            this.bookmarkCount = 0L;
+            this.replyCount = 0L;
+        }
+    }
 }
