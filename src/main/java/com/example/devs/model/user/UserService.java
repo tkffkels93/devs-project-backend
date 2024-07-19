@@ -273,37 +273,19 @@ public class UserService {
     }
 
     // 마이페이지
-    public UserResponse.MypageDTO getMyInfo(Integer userId, Pageable pageable) {
-        // JWT에서 사용자 ID 추출
-        // Integer id = JwtUtil.getUserIdFromJwt(jwt);
-
-        // 추출한 정보로 사용자 정보 조회하기
+    public UserResponse.MypageDTO getMyInfo(Integer userId, Pageable pageable, String type) {
+        // 사용자 정보 조회
         Optional<User> userOptional = userRepository.findById(userId);
         User user = userOptional.get();
 
         // 내가 작성한 게시글 조회
         List<Board> myBoards = userRepository.findMyBoardsById(userId, pageable).getContent();
-
-        // 내가 작성한 댓글 조회
-        List<Reply> myReplies = userRepository.findMyRepliesById(userId, pageable).getContent();
-
         // 게시글 목록 변환
-        List<UserResponse.MypageDTO.MyBoardList> myBoardList = myBoards.stream()
-                .map(board -> new UserResponse.MypageDTO.MyBoardList(
+        List<UserResponse.MyBoardListDTO> myBoardList = myBoards.stream()
+                .map(board -> new UserResponse.MyBoardListDTO(
                         board.getId(),
                         board.getTitle(),
                         LocalDateTimeFormatter.getDuration(board.getCreatedAt()) // 날짜 변환
-                ))
-                .collect(Collectors.toList());
-
-        // 댓글 목록 변환
-        List<UserResponse.MypageDTO.MyReplyList> myReplyList = myReplies.stream()
-                .map(reply -> new UserResponse.MypageDTO.MyReplyList(
-                        reply.getId(),
-                        reply.getBoard().getId(),
-                        reply.getComment(),
-                        reply.getBoard().getTitle(),
-                        LocalDateTimeFormatter.getDuration(reply.getCreatedAt()) // 날짜 변환
                 ))
                 .collect(Collectors.toList());
 
@@ -315,7 +297,6 @@ public class UserService {
                 .position(user.getPosition())
                 .introduce(user.getIntroduce())
                 .myBoardList(myBoardList)
-                .myReplyList(myReplyList)
                 .build();
 
         return mypageDTO;
@@ -354,5 +335,40 @@ public class UserService {
                 .build();
 
         return userProfileDTO;
+    }
+
+    // 내가 작성한 게시글 조회(마이페이지)
+    public List<UserResponse.MyBoardListDTO> getBoardPage(Integer userId, Pageable pageable) {
+        // 내가 작성한 게시글 조회
+        List<Board> myBoards = userRepository.findMyBoardsById(userId, pageable).getContent();
+        // 게시글 목록 변환
+        List<UserResponse.MyBoardListDTO> myBoardListDTO = myBoards.stream()
+                .map(board -> new UserResponse.MyBoardListDTO(
+                        board.getId(),
+                        board.getTitle(),
+                        LocalDateTimeFormatter.getDuration(board.getCreatedAt()) // 날짜 변환
+                ))
+                .collect(Collectors.toList());
+
+        return myBoardListDTO;
+    }
+
+    // 내가 작성한 댓글(마이페이지)
+    public List<UserResponse.MyReplyListDTO> getMyReplies(Integer userId, Pageable pageable) {
+        // 내가 작성한 댓글 조회
+        List<Reply> myReplies = userRepository.findMyRepliesById(userId, pageable).getContent();
+
+        // 댓글 목록 변환
+            List<UserResponse.MyReplyListDTO> myReplyList = myReplies.stream()
+                    .map(reply -> new UserResponse.MyReplyListDTO(
+                            reply.getId(),
+                            reply.getBoard().getId(),
+                            reply.getComment(),
+                            reply.getBoard().getTitle(),
+                            LocalDateTimeFormatter.getDuration(reply.getCreatedAt()) // 날짜 변환
+                    ))
+                    .collect(Collectors.toList());
+
+        return myReplyList;
     }
 }

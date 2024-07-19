@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
 @RestController
@@ -62,19 +64,37 @@ public class UserRestController {
 
     }
 
-    // 마이페이지
     @GetMapping("/mypage")
     public ResponseEntity<?> getMyInfo(HttpServletRequest request,
+                                       @RequestParam(defaultValue = "boards") String type,
                                        @RequestParam(defaultValue = "1") Integer page,
                                        @RequestParam(defaultValue = "10") Integer size) {
         Pageable pageable = PageRequest.of(page - 1, size); // 클라이언트는 1부터 시작, 서버는 0부터 시작
 
-        //현재 접속한 사용자 아이디 가져오기
+        // 현재 접속한 사용자 아이디 가져오기
         HttpSession session = request.getSession();
         SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
 
-        UserResponse.MypageDTO mypageDTO = userService.getMyInfo(sessionUser.getId(), pageable);
-        return ResponseEntity.ok().body(new ApiUtil<>(mypageDTO));
+        // 게시글 요청 시
+        if (type.equals("boards")) {
+            if (page == 1) {
+                // 최초 요청 시 유저 프로필 정보와 첫 페이지의 게시글 정보를 반환
+                UserResponse.MypageDTO mypageDTO = userService.getMyInfo(sessionUser.getId(), pageable, type);
+                return ResponseEntity.ok().body(new ApiUtil<>(mypageDTO));
+            } else {
+                // 다음 페이지 게시글만 반환
+                List<UserResponse.MyBoardListDTO> myBoardListDTO = userService.getBoardPage(sessionUser.getId(), pageable);
+                return ResponseEntity.ok().body(new ApiUtil<>(myBoardListDTO));
+            }
+
+        // 댓글 요청 시
+        } else if (type.equals("replies")) {
+            // 내가 단 댓글만 반환
+            List<UserResponse.MyReplyListDTO> myReplyListDTO = userService.getMyReplies(sessionUser.getId(), pageable);
+            return ResponseEntity.ok().body(new ApiUtil<>(myReplyListDTO));
+        } else {
+            return ResponseEntity.badRequest().body(new ApiUtil<>(400, "유효하지 않은 요청"));
+        }
     }
 
     // 사용자 프로필 조회
