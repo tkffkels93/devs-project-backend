@@ -35,7 +35,7 @@ public class ReplyService {
 
     // 댓글 작성
     @Transactional
-    public void createReply(Integer userId, Integer boardId, String comment) {
+    public void createReply(Integer userId, Integer boardId, ReplyRequest.ReplySaveDTO reqDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new Exception401("로그인 후 이용 가능합니다."));
 
@@ -43,7 +43,7 @@ public class ReplyService {
                 .orElseThrow(() -> new Exception404("해당 게시글을 찾을 수 없습니다."));
 
         Reply reply = Reply.builder()
-                .comment(comment)
+                .comment(reqDTO.getComment())
                 .user(user)
                 .board(board)
                 .boardRole(board.getBoardRole())
