@@ -5,10 +5,7 @@ import com.example.devs.model.user.SessionUser;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/bookmark")
@@ -24,5 +21,21 @@ public class BookmarkRestController {
         SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
         BookmarkResponse.ListDTO BookmarkList = bookmarkService.getBookmarkList(sessionUser.getId(), page, size);
         return ResponseEntity.ok().body(new ApiUtil<>(BookmarkList));
+    }
+
+    // 북마크 등록
+    @PostMapping("/{boardId}")
+    public ResponseEntity<?> addBookmark(@PathVariable Integer boardId) {
+        SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
+        bookmarkService.addBookmark(sessionUser.getId(), boardId);
+        return ResponseEntity.ok().body(new ApiUtil<>("북마크 추가 성공"));
+    }
+
+    // 북마크 삭제
+    @DeleteMapping("/{boardId}")
+    public ResponseEntity<?> deleteBookmark(@PathVariable Integer boardId) {
+        SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
+        bookmarkService.deleteBookmark(sessionUser.getId(), boardId);
+        return ResponseEntity.ok().body(new ApiUtil<>("북마크 삭제 성공"));
     }
 }

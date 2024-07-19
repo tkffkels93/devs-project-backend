@@ -45,11 +45,14 @@ public class Reply {
     private LocalDateTime updatedAt; // 수정일
 
     @Builder
-    public Reply(Integer id, User user, Board board, String comment, ReplyStatus status) {
+    public Reply(Integer id, User user, BoardRole boardRole, Board board, String comment, ReplyStatus status, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.user = user;
+        this.boardRole = boardRole;
         this.board = board;
         this.comment = comment;
         this.status = status;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 }
