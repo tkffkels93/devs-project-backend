@@ -79,8 +79,10 @@ public class BoardService {
             board.setHit( board.getHit() + 1 );
         }
 
+        //댓글 가져오기&이미지 가져오기
         List<BoardResponse.ReplyDTO> repliesDto = replyService.getReplies(boardRole, boardId, userId);
-        BoardResponse.DetailDTO dto = new BoardResponse.DetailDTO(board, repliesDto);
+        List<BoardResponse.PhotoDTO> photoDTOs = photoService.getPhotos(boardId);
+        BoardResponse.DetailDTO dto = new BoardResponse.DetailDTO(board, repliesDto, photoDTOs);
         dto.setOwner(
                 board.getUser().getId().equals(userId) //이 글의 작성자이면 true로 셋팅
         );
