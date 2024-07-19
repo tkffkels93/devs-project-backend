@@ -1,11 +1,12 @@
 package com.example.devs;
 
+import com.example.devs._core.utils.DeltaController;
 import com.example.devs.model.board.BoardRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+
+import java.io.IOException;
 
 @DataJpaTest
 public class BoardTest {
@@ -13,30 +14,12 @@ public class BoardTest {
     private BoardRepository boardRepository;
 
     @Test
-    public void test() {
-        Pageable pageable = PageRequest.of(0, 10);
-//        Page<Board> boards = boardRepository.findAllByBoardRole(pageable, BoardRole.Board);
-//
-//        Page<BoardResponse.ListDTO> boards2 = boards.map(BoardResponse.ListDTO::new);
-//                boards2.forEach(
-//                        System.out::println
-//        );
-
-//        Page<Board> boards =  boardRepository.findAll(pageable);
-//        Page<BoardResponse.ListDTO> boards2 = boards.map(BoardResponse.ListDTO::new);
-//        boards2.forEach(
-//                board -> System.out.println(board)
-//        );
-
-//        Page<BoardResponse.ListDTO> boards.map(BoardResponse.ListDTO::new).stream().toList();
-//
-//        Page<Board> boards = boardRepository.findAll(pageable);
-//        Page<BoardDTO> boardDTOs = boards.map(BoardMapper::toDto);
-
-
-//        boards.forEach(System.out::println);
-//        System.out.println("boards = " + boards);
-
+    public void test() throws IOException {
+        String deltaJson = "{\"ops\":[{\"insert\":\"Hello, world!\\n\"},{\"insert\":\"This is a bold text.\",\"attributes\":{\"bold\":true}},{\"insert\":\"\\n\"},{\"insert\":\"This is an italic text.\",\"attributes\":{\"italic\":true}},{\"insert\":\"\\n\"},{\"insert\":\"This is an underlined text.\",\"attributes\":{\"underline\":true}},{\"insert\":\"\\n\"}]}";
+        deltaJson = "[{\"insert\":\"Hello, world!\\n\"},{\"insert\":\"This is a bold text.\",\"attributes\":{\"bold\":true}},{\"insert\":\"\\n\"},{\"insert\":\"This is an italic text.\",\"attributes\":{\"italic\":true}},{\"insert\":\"\\n\"},{\"insert\":\"This is an underlined text.\",\"attributes\":{\"underline\":true}},{\"insert\":\"\\n\"}]";
+//        deltaJson = DeltaController.addOps(deltaJson);
+//        System.out.println("deltaJson = " + deltaJson);
+        String convertedHTML = DeltaController.convertDeltaToHtml(deltaJson);
+        System.out.println("convertedHTML = " + convertedHTML);
     }
-
 }
