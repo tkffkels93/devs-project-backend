@@ -61,8 +61,8 @@ public class BoardService {
             dto.setReplyCount(replyCount);
             if (board.getUser().getId().equals(userId)) { //이 게시글이 내가 쓴 글이면
                 //좋아요 눌렀는지 확인 후 true/false 설정
-                dto.setMyLike( likeService.isLiked(boardRole, board.getId(), userId) );
-                dto.setMyBookmark( bookmarkService.isBookmarked(boardRole, board.getId(), userId) );
+                dto.setMyLike(likeService.isLiked(boardRole, board.getId(), userId));
+                dto.setMyBookmark(bookmarkService.isBookmarked(boardRole, board.getId(), userId));
             }
             boardDtoList.add(dto);
         }
@@ -76,7 +76,7 @@ public class BoardService {
                 .orElseThrow(() -> new Exception404("게시물을 찾을 수 없습니다."));
         //조회수 증가 --> 본인이 작성한 글을 조회하는 경우에는 조회수가 증가하지 않음
         if (!board.getUser().getId().equals(userId)) {
-            board.setHit( board.getHit() + 1 );
+            board.setHit(board.getHit() + 1);
         }
 
         //댓글 가져오기&이미지 가져오기
@@ -170,60 +170,64 @@ public class BoardService {
         board.setStatus(BoardStatus.DELETED);
         boardRepository.save(board);
     }
+
     //일반사용자용 게시글 작성하기
+    @Transactional
     public void writeBoard(Integer userId, BoardRequest.Write writeDto) throws IOException {
 
         //게시글 먼저 저장. 이미지는 아래에 따로 저장
         Board board = Board.builder()
-                        .title(writeDto.getTitle())
-                        .content(writeDto.getContent())
-                        .hit(0)
-                        .boardRole(BoardRole.Board)
-                        .status(BoardStatus.PUBLISHED)
-                        .user(User.builder().id(userId).build())
-                        .build();
-        board=boardRepository.save(board);
+                .title(writeDto.getTitle())
+                .content(writeDto.getContent())
+                .hit(0)
+                .boardRole(BoardRole.Board)
+                .status(BoardStatus.PUBLISHED)
+                .user(User.builder().id(userId).build())
+                .build();
+        board = boardRepository.save(board);
 
         List<BoardRequest.Base64Image> base64Images = writeDto.getImages();
 
         // 1. JSON으로 전달된 이미지를 순회하며 파일로 저장,
         // 2. Photo_tb에 저장
-        for (BoardRequest.Base64Image image : base64Images) {
+        if (base64Images != null) {
+            for (BoardRequest.Base64Image image : base64Images) {
 
-            //1
-            byte[] imageBytes;
-            try {
-                imageBytes = Base64.getDecoder().decode(image.getImageData());
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Invalid Base64 data for image: " + image.getFileName(), e);
+                //1
+                byte[] imageBytes;
+                try {
+                    imageBytes = Base64.getDecoder().decode(image.getImageData());
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Invalid Base64 data for image: " + image.getFileName(), e);
+                }
+
+                String originalFileName = image.getFileName();
+                String fileExtension = FileUtil.getFileExtension(originalFileName);
+                String uuidFileName = UUID.randomUUID().toString() + fileExtension;
+
+                // 저장할 디렉토리 경로 설정
+                String directoryPath = "/upload/";
+                File directory = new File(directoryPath);
+                if (!directory.exists()) {
+                    directory.mkdirs(); // 디렉토리가 존재하지 않으면 생성
+                }
+
+                String filePath = directoryPath + uuidFileName;
+
+                try (FileOutputStream fos = new FileOutputStream(new File(filePath))) {
+                    fos.write(imageBytes);
+                } catch (IOException e) {
+                    throw new IOException("Failed to save image: " + originalFileName, e);
+                }
+
+                //2
+                Photo photo = Photo.builder()
+                        .board(board)
+                        .fileName(uuidFileName)
+                        .filePath(filePath)
+                        .build();
+                photoService.savePhoto(photo);
             }
-
-            String originalFileName = image.getFileName();
-            String fileExtension = FileUtil.getFileExtension(originalFileName);
-            String uuidFileName = UUID.randomUUID().toString() + fileExtension;
-
-            // 저장할 디렉토리 경로 설정
-            String directoryPath = "upload/";
-            File directory = new File(directoryPath);
-            if (!directory.exists()) {
-                directory.mkdirs(); // 디렉토리가 존재하지 않으면 생성
-            }
-
-            String filePath = directoryPath + uuidFileName;
-
-            try (FileOutputStream fos = new FileOutputStream(new File(filePath))) {
-                fos.write(imageBytes);
-            } catch (IOException e) {
-                throw new IOException("Failed to save image: " + originalFileName, e);
-            }
-
-            //2
-            Photo photo = Photo.builder()
-                    .board(board)
-                    .fileName(uuidFileName)
-                    .filePath(filePath)
-                    .build();
-            photoService.savePhoto(photo);
         }
     }
 }
