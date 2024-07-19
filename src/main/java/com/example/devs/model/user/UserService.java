@@ -300,6 +300,7 @@ public class UserService {
         List<UserResponse.MypageDTO.MyReplyList> myReplyList = myReplies.stream()
                 .map(reply -> new UserResponse.MypageDTO.MyReplyList(
                         reply.getId(),
+                        reply.getBoard().getId(),
                         reply.getComment(),
                         reply.getBoard().getTitle(),
                         LocalDateTimeFormatter.getDuration(reply.getCreatedAt()) // 날짜 변환
@@ -308,7 +309,7 @@ public class UserService {
 
         // 조회한 정보 DTO에 담기
         UserResponse.MypageDTO mypageDTO = UserResponse.MypageDTO.builder()
-                .id(user.getId())
+                .userId(user.getId())
                 .image(user.getImage())
                 .nickname(user.getNickname())
                 .position(user.getPosition())
