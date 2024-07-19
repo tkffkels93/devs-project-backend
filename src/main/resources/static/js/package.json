@@ -1,0 +1,17 @@
+{
+  "name": "delta-to-html",
+  "version": "1.0.0",
+  "description": "Convert Quill Delta to HTML",
+  "main": "deltaToHtml.js",
+  "dependencies": {
+    "quill-delta-to-html": "^0.10.4"
+  },
+  "devDependencies": {
+    "browserify": "^17.0.0"
+  },
+  "scripts": {
+    "bundle": "browserify deltaToHtml.js -o deltaToHtml.bundle.js --standalone convertModule"
+  },
+  "author": "",
+  "license": "ISC"
+}
