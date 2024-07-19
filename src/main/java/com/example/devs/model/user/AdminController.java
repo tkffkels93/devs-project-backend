@@ -1,5 +1,6 @@
 package com.example.devs.model.user;
 
+import com.example.devs._core.utils.DeltaController;
 import com.example.devs.model.board.BoardResponse;
 import com.example.devs.model.board.BoardService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.io.IOException;
 
 @RequiredArgsConstructor
 @RequestMapping("/admin")
@@ -78,9 +81,14 @@ public class AdminController {
 
     // 게시글 상세 정보
     @GetMapping("/boards/{boardId}")
-    public String getBoardDetail(HttpServletRequest request, @PathVariable Integer boardId) {
+    public String getBoardDetail(HttpServletRequest request, @PathVariable Integer boardId) throws IOException {
         User sessionAdmin = (User) session.getAttribute("sessionAdmin");
         BoardResponse.BoardDetailDTO boardDetail = boardService.getBoardDetail(sessionAdmin, boardId);
+        //Quill Delta --> HTML 변환 작업
+        String deltaContent = boardDetail.getContent();
+        deltaContent=DeltaController.convertDeltaToHtml(deltaContent);
+        boardDetail.setContent(deltaContent);
+
         request.setAttribute("boardDetail", boardDetail);
         return "admin/board/boardDetailPage";
     }

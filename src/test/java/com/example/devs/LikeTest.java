@@ -18,8 +18,8 @@ public class LikeTest {
     public void test() {
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable = PageRequest.of(1, 10, sort);
-        Integer count = likeRepository.countLike(BoardRole.Board, 1, 4);
-        System.out.println("count = " + count);
+//        Integer count = likeRepository.countLike(BoardRole.Board, 1, 4);
+//        System.out.println("count = " + count);
 
         // Like like = likeRepository.countLike2(BoardRole.Board, 1, 4);
         // System.out.println("like = " + like.getId());
