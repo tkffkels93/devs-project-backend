@@ -183,28 +183,27 @@ public class UserResponse {
         private String nickname;               // 닉네임
         private String position;               // 직함
         private String introduce;              // 자기소개
-        private List<MyBoardList> myBoardList; // 내가 작성한 글
-        private List<MyReplyList> myReplyList; // 내가 작성한 댓글
+        private List<MyBoardListDTO> myBoardList; // 내가 작성한 글
+    }
 
-        // 내가 작성한 글
-        @Data
-        @Builder
-        public static class MyBoardList {
-            private Integer boardId;  // PK
-            private String title;     // 제목
-            private String updatedAt; // 작성일
-        }
+    // 내가 작성한 글
+    @Data
+    @Builder
+    public static class MyBoardListDTO {
+        private Integer boardId;  // PK
+        private String title;     // 제목
+        private String updatedAt; // 작성일
+    }
 
-        // 내가 작성한 댓글
-        @Data
-        @Builder
-        public static class MyReplyList {
-            private Integer replyId;   // PK
-            private Integer boardId;   // 게시판 ID
-            private String comment;    // 댓글 내용
-            private String boardTitle; // 댓글이 작성된 글 제목
-            private String updatedAt;  // 작성일
-        }
+    // 내가 작성한 댓글
+    @Data
+    @Builder
+    public static class MyReplyListDTO {
+        private Integer replyId;   // PK
+        private Integer boardId;   // 게시판 ID
+        private String comment;    // 댓글 내용
+        private String boardTitle; // 댓글이 작성된 글 제목
+        private String updatedAt;  // 작성일
     }
 
     // 유저 프로필 DTO
