@@ -149,7 +149,7 @@ public class BoardResponse {
         private List<ReplyDTO> replies;
         private List<PhotoDTO> images;
 
-        public DetailDTO(Board board, List<ReplyDTO> replies, List<PhotoDTO> images) {
+        public DetailDTO(Board board, List<ReplyDTO> replies, List<PhotoDTO> images, Boolean myBookmark, Boolean myLike) {
             this.boardId = board.getId();
             this.boardTitle = board.getTitle();
             this.boardContent = board.getContent();
@@ -160,8 +160,8 @@ public class BoardResponse {
             this.userImage = board.getUser().getImage();
             this.boardCreatedAt = LocalDateTimeFormatter.convert(board.getCreatedAt());
             this.boardCreatedAtDuration = LocalDateTimeFormatter.getDuration(board.getCreatedAt());
-            this.myLike = false;
-            this.myBookmark = false;
+            this.myLike = myLike;
+            this.myBookmark = myBookmark;
             this.isOwner = false;
             this.likeCount = 0L;
             this.bookmarkCount = 0L;
