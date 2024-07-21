@@ -7,6 +7,8 @@ import com.example.devs._core.errors.exception.Exception401;
 import com.example.devs._core.errors.exception.Exception403;
 import com.example.devs._core.errors.exception.Exception404;
 import com.example.devs._core.utils.FileUtil;
+import com.example.devs.model.bookmark.Bookmark;
+import com.example.devs.model.bookmark.BookmarkRepository;
 import com.example.devs.model.bookmark.BookmarkService;
 import com.example.devs.model.like.LikeService;
 import com.example.devs.model.photo.Photo;
@@ -34,6 +36,7 @@ public class BoardService {
     private final UserRepository userRepository;
     private final LikeService likeService;
     private final BookmarkService bookmarkService;
+    private final BookmarkRepository bookmarkRepository;
     private final ReplyRepository replyRepository;
     private final ReplyService replyService;
     private final PhotoRepository photoRepository;
@@ -77,10 +80,17 @@ public class BoardService {
             board.setHit(board.getHit() + 1);
         }
 
+        // 게시글 북마크, 좋아요 여부
+        Boolean isBookmarked = bookmarkService.isBookmarked(boardRole, boardId, userId);
+        Boolean isLiked = likeService.isLiked(boardRole, boardId, userId);
+        System.out.println("Aaaaaaa : " + isBookmarked);
+
         //댓글 가져오기&이미지 가져오기
         List<BoardResponse.ReplyDTO> repliesDto = replyService.getReplies(boardRole, boardId, userId);
         List<BoardResponse.PhotoDTO> photoDTOs = photoService.getPhotos(boardId);
-        BoardResponse.DetailDTO dto = new BoardResponse.DetailDTO(board, repliesDto, photoDTOs);
+
+
+        BoardResponse.DetailDTO dto = new BoardResponse.DetailDTO(board, repliesDto, photoDTOs, isBookmarked, isLiked);
         dto.setOwner(
                 board.getUser().getId().equals(userId) //이 글의 작성자이면 true로 셋팅
         );
@@ -219,7 +229,7 @@ public class BoardService {
 
 
                 String filePath2 = "/upload/" + uuidFileName;
-                
+
                 //2
                 Photo photo = Photo.builder()
                         .board(board)
@@ -251,8 +261,8 @@ public class BoardService {
             dto.setReplyCount(replyCount);
             if (board.getUser().getId().equals(userId)) { //이 게시글이 내가 쓴 글이면
                 //좋아요 눌렀는지 확인 후 true/false 설정
-                dto.setMyLike( likeService.isLiked(boardRole, board.getId(), userId) );
-                dto.setMyBookmark( bookmarkService.isBookmarked(boardRole, board.getId(), userId) );
+                dto.setMyLike(likeService.isLiked(boardRole, board.getId(), userId));
+                dto.setMyBookmark(bookmarkService.isBookmarked(boardRole, board.getId(), userId));
             }
             boardDtoList.add(dto);
         }
