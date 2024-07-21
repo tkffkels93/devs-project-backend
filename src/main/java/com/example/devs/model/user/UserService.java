@@ -154,20 +154,20 @@ public class UserService {
     // OAuth 로그인
     public String oauthLogin(UserProvider provider, String code) {
         OAuthLoginService<?> loginService = getOAuthProvider(provider);
-        UserResponse.OAuthTokenDTO tokenDTO = loginService.getAccessToken(code);
+        // UserResponse.OAuthTokenDTO tokenDTO = loginService.getAccessToken(code);
 
         if (provider == UserProvider.KAKAO) {
-            UserResponse.KakaoUserDTO userDTO = (UserResponse.KakaoUserDTO) loginService.getUserInfo(tokenDTO.getAccessToken());
-            accessTokenStorage.saveToken(userDTO.getId().toString(), tokenDTO.getAccessToken());
+            UserResponse.KakaoUserDTO userDTO = (UserResponse.KakaoUserDTO) loginService.getUserInfo(code);
+            // accessTokenStorage.saveToken(userDTO.getId().toString(), tokenDTO.getAccessToken());
             // 액세스 토큰 출력
-            accessTokenStorage.printAllTokens();
+            // accessTokenStorage.printAllTokens();
             //
             return findOrSaveUser(userDTO, provider);
         } else if (provider == UserProvider.NAVER) {
-            UserResponse.NaverUserDTO userDTO = (UserResponse.NaverUserDTO) loginService.getUserInfo(tokenDTO.getAccessToken());
-            accessTokenStorage.saveToken(userDTO.getResponse().getId(), tokenDTO.getAccessToken());
+            UserResponse.NaverUserDTO userDTO = (UserResponse.NaverUserDTO) loginService.getUserInfo(code);
+            // accessTokenStorage.saveToken(userDTO.getResponse().getId(), tokenDTO.getAccessToken());
             // 액세스 토큰 출력
-            accessTokenStorage.printAllTokens();
+            // accessTokenStorage.printAllTokens();
             //
             return findOrSaveUser(userDTO, provider);
         } else {
