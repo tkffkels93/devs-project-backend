@@ -22,7 +22,7 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Integer> {
 
     // 회원이 저장한 북마크 찾기
     @Query("SELECT bm FROM Bookmark bm JOIN FETCH bm.board b JOIN FETCH b.user u WHERE bm.user.id = :userId and b.status = :status ORDER BY b.createdAt DESC")
-    Page<Bookmark> findBookmarksByUserId(@Param("userId") Integer userId, BoardStatus status, Pageable pageable);
+    Page<Bookmark> findBookmarksByUserId(@Param("userId") Integer userId,@Param("status") BoardStatus status,@Param("pageable") Pageable pageable);
 
     // 해당 해원의 북마크 여부 확인
     @Query("select (count(b) > 0) from Bookmark b where b.user.id = :userId and b.id = :bookmarkId")
