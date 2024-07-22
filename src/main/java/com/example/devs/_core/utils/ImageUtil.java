@@ -1,11 +1,15 @@
 package com.example.devs._core.utils;
 
 import com.example.devs.model.board.BoardRequest;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -133,5 +137,38 @@ public class ImageUtil {
             return uploadResults;
         }
         return null;
+    }
+
+    // 링크 이미지 다운로드
+    public static String downloadImage(String imageUrl) {
+        // 이미지 URL에서 파일 확장자 추출
+        String fileExtension = imageUrl.substring(imageUrl.lastIndexOf("."));
+        // UUID로 고유한 파일 이름 생성
+        String fileName = UUID.randomUUID().toString() + fileExtension;
+        String destinationFilePath = UPLOAD_DIR + fileName;
+
+        try {
+            URL url = new URL(imageUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            InputStream inputStream = connection.getInputStream();
+            Path savePath = Paths.get(destinationFilePath);
+            Files.createDirectories(savePath.getParent());
+
+            try (FileOutputStream outputStream = new FileOutputStream(savePath.toFile())) {
+                IOUtils.copy(inputStream, outputStream);
+            }
+
+            inputStream.close();
+            connection.disconnect();
+
+            System.out.println("Image downloaded successfully: " + destinationFilePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Failed to download image: " + e.getMessage());
+            return null;
+        }
+        return "/upload/" + fileName;
     }
 }
