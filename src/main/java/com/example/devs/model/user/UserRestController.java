@@ -121,7 +121,7 @@ public class UserRestController {
     }
 
     // 사용자 프로필 수정
-    @PostMapping("/profile/update")
+    @PutMapping("/profile/update")
     public ResponseEntity<?> updateProfile(HttpServletRequest request,
                                            @RequestBody UserRequest.UpdateProfileDTO updateProfileDTO) {
         //현재 접속한 사용자 아이디 가져오기
