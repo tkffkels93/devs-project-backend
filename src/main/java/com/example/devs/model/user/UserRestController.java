@@ -106,4 +106,24 @@ public class UserRestController {
         UserResponse.UserProfileDTO userProfileDTO = userService.getUserProfile(userId, pageable);
         return ResponseEntity.ok().body(new ApiUtil<>(userProfileDTO));
     }
+
+    // 사용자 프로필 수정
+    @PostMapping("/profile/update")
+    public ResponseEntity<?> updateProfile(HttpServletRequest request,
+                                           @RequestBody UserRequest.UpdateProfileDTO updateProfileDTO) {
+        //현재 접속한 사용자 아이디 가져오기
+        HttpSession session = request.getSession();
+        SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
+
+        // 업데이트
+        Integer result = userService.updateProfile(sessionUser.getId(), updateProfileDTO);
+
+        if (result == 1) {
+            // 업데이트 성공
+            return ResponseEntity.ok(new ApiUtil<>(null));
+        }else {
+            // 업데이트 실패
+            return ResponseEntity.status(400).body(new ApiUtil<>(400, "업데이트 실패"));
+        }
+    }
 }
