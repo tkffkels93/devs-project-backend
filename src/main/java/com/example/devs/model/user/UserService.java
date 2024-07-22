@@ -380,16 +380,24 @@ public class UserService {
     }
 
     // 프로필 업데이트
-    public Integer updateProfile(Integer id, UserRequest.UpdateProfileDTO updateProfileDTO) {
+    public UserResponse.UpdateProfileInfoDTO updateProfile(Integer id, UserRequest.UpdateProfileDTO resquestDTO) {
         // 업데이트 정보 DB에 전달
         Integer result = userRepository.updateProfileById(id,
-                                                          updateProfileDTO.getNickname(),
-                                                          updateProfileDTO.getPosition(),
-                                                          updateProfileDTO.getIntroduce(),
-                                                          updateProfileDTO.getProfileImg());
+                                                          resquestDTO.getNickname(),
+                                                          resquestDTO.getPosition(),
+                                                          resquestDTO.getIntroduce(),
+                                                          resquestDTO.getProfileImg());
 
-        // 결과 반환: 1 (성공), 0 (실패)
-        return result;
+        // 업데이트 실패
+        if (result != 1) { throw new Exception400("업데이트 실패."); }
+
+        // 결과 반환
+        return UserResponse.UpdateProfileInfoDTO.builder()
+                .nickname(resquestDTO.getNickname())
+                .position(resquestDTO.getPosition())
+                .introduce(resquestDTO.getIntroduce())
+                .profileImg(resquestDTO.getProfileImg())
+                .build();
     }
 
 }
