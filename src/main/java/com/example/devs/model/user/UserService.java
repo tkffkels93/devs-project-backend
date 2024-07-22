@@ -33,6 +33,8 @@ public class UserService {
     private final List<OAuthLoginService> oAuthLoginServices;
     private final AccessTokenStorage accessTokenStorage;
 
+    static final String BASIC_IMAGE_PATH = "/src/main/resources/static/images/profile_basic.png";
+
     // 로그인 (관리자)
     @Transactional
     public User adminLogin(UserRequest.AdminLoginDTO adminLoginDTO) {
@@ -141,7 +143,7 @@ public class UserService {
                 .username(joinDTO.getUsername())
                 .phone(joinDTO.getPhone())
                 .birth(bod)
-                .image(null)
+                .image(BASIC_IMAGE_PATH)
                 .introduce(joinDTO.getIntroduce())
                 .position(joinDTO.getPosition())
                 .role(UserRole.USER)
