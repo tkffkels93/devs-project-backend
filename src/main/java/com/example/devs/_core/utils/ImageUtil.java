@@ -1,11 +1,16 @@
 package com.example.devs._core.utils;
 
+import com.example.devs.model.board.BoardRequest;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -86,5 +91,47 @@ public class ImageUtil {
         return uploadResults;
     }
 
+    public static List<FileUploadResult> uploadBase64Images(List<BoardRequest.Base64Image> base64Images) throws IOException {
+        List<FileUploadResult> uploadResults = new ArrayList<>();
+        // 1. JSON으로 전달된 이미지를 순회하며 파일로 저장,
+        // 2. Photo_tb에 저장
+        if (base64Images != null) {
+            for (BoardRequest.Base64Image image : base64Images) {
+                //1
+                byte[] imageBytes;
+                try {
+                    imageBytes = Base64.getDecoder().decode(image.getImageData());
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Invalid Base64 data for image: " + image.getFileName(), e);
+                }
 
+                String originalFileName = image.getFileName();
+                String fileExtension = FileUtil.getFileExtension(originalFileName);
+                String uuidFileName = UUID.randomUUID().toString() + fileExtension;
+
+                // 저장할 디렉토리 경로 설정
+                String directoryPath = "./upload/";
+                File directory = new File(directoryPath);
+                if (!directory.exists()) {
+                    directory.mkdirs(); // 디렉토리가 존재하지 않으면 생성
+                }
+
+                String filePath = directoryPath + uuidFileName;
+
+                try (FileOutputStream fos = new FileOutputStream(new File(filePath))) {
+                    fos.write(imageBytes);
+                } catch (IOException e) {
+                    throw new IOException("Failed to save image: " + originalFileName, e);
+                }
+                String filePath2 = "/upload/" + uuidFileName;
+                uploadResults.add( new FileUploadResult(uuidFileName, filePath2) );
+            }
+            for (FileUploadResult result : uploadResults) {
+                System.out.println("result.getFileName() = " + result.getFileName());
+                System.out.println("result.getFilePath() = " + result.getFilePath());
+            }
+            return uploadResults;
+        }
+        return null;
+    }
 }

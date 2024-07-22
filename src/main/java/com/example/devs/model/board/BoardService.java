@@ -6,8 +6,7 @@ import com.example.devs._core.errors.exception.Exception400;
 import com.example.devs._core.errors.exception.Exception401;
 import com.example.devs._core.errors.exception.Exception403;
 import com.example.devs._core.errors.exception.Exception404;
-import com.example.devs._core.utils.FileUtil;
-import com.example.devs.model.bookmark.Bookmark;
+import com.example.devs._core.utils.ImageUtil;
 import com.example.devs.model.bookmark.BookmarkRepository;
 import com.example.devs.model.bookmark.BookmarkService;
 import com.example.devs.model.like.LikeService;
@@ -23,10 +22,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @RequiredArgsConstructor
@@ -193,48 +192,14 @@ public class BoardService {
                 .build();
         board = boardRepository.save(board);
 
-        List<BoardRequest.Base64Image> base64Images = writeDto.getImages();
-
-        // 1. JSON으로 전달된 이미지를 순회하며 파일로 저장,
-        // 2. Photo_tb에 저장
-        if (base64Images != null) {
-            for (BoardRequest.Base64Image image : base64Images) {
-
-                //1
-                byte[] imageBytes;
-                try {
-                    imageBytes = Base64.getDecoder().decode(image.getImageData());
-                } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException("Invalid Base64 data for image: " + image.getFileName(), e);
-                }
-
-                String originalFileName = image.getFileName();
-                String fileExtension = FileUtil.getFileExtension(originalFileName);
-                String uuidFileName = UUID.randomUUID().toString() + fileExtension;
-
-                // 저장할 디렉토리 경로 설정
-                String directoryPath = "./upload/";
-                File directory = new File(directoryPath);
-                if (!directory.exists()) {
-                    directory.mkdirs(); // 디렉토리가 존재하지 않으면 생성
-                }
-
-                String filePath = directoryPath + uuidFileName;
-
-                try (FileOutputStream fos = new FileOutputStream(new File(filePath))) {
-                    fos.write(imageBytes);
-                } catch (IOException e) {
-                    throw new IOException("Failed to save image: " + originalFileName, e);
-                }
-
-
-                String filePath2 = "/upload/" + uuidFileName;
-
-                //2
+        List<ImageUtil.FileUploadResult> fileUploadResults;
+        if ( writeDto.getImages() != null ) {
+            fileUploadResults = ImageUtil.uploadBase64Images(writeDto.getImages());
+            for( ImageUtil.FileUploadResult fileUploadResult : fileUploadResults) {
                 Photo photo = Photo.builder()
                         .board(board)
-                        .fileName(uuidFileName)
-                        .filePath(filePath2)
+                        .fileName(fileUploadResult.getFileName())
+                        .filePath(fileUploadResult.getFilePath())
                         .build();
                 photoService.savePhoto(photo);
             }
