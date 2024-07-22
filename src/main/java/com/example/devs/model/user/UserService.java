@@ -217,11 +217,12 @@ public class UserService {
                 providerId = kakaoUser.getId().toString();
             } else {
                 UserResponse.NaverUserDTO naverUser = (UserResponse.NaverUserDTO) userDTO;
+                String saveImageName = ImageUtil.downloadImage(naverUser.getResponse().getProfileImage());
                 nickname = naverUser.getResponse().getNickname();
                 username = naverUser.getResponse().getName();
                 phone = naverUser.getResponse().getMobile();
                 birth = LocalDateTimeFormatter.parseBirth(naverUser.getResponse().getBirthyear(), naverUser.getResponse().getBirthday());
-                profileImage = naverUser.getResponse().getProfileImage();
+                profileImage = saveImageName;
                 providerId = naverUser.getResponse().getId();
             }
 
