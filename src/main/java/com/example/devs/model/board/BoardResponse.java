@@ -143,13 +143,13 @@ public class BoardResponse {
         private boolean myLike;
         private boolean myBookmark;
         private boolean isOwner;
-        private Long likeCount;
+        private Integer likeCount;
         private Long bookmarkCount;
         private Integer replyCount;
         private List<ReplyDTO> replies;
         private List<PhotoDTO> images;
 
-        public DetailDTO(Board board, List<ReplyDTO> replies, List<PhotoDTO> images, Boolean myBookmark, Boolean myLike) {
+        public DetailDTO(Board board, List<ReplyDTO> replies, List<PhotoDTO> images, Boolean myBookmark, Boolean myLike, Integer likeCount) {
             this.boardId = board.getId();
             this.boardTitle = board.getTitle();
             this.boardContent = board.getContent();
@@ -163,7 +163,7 @@ public class BoardResponse {
             this.myLike = myLike;
             this.myBookmark = myBookmark;
             this.isOwner = false;
-            this.likeCount = 0L;
+            this.likeCount = likeCount;
             this.bookmarkCount = 0L;
             this.replyCount = replies.size();
             this.replies = replies;

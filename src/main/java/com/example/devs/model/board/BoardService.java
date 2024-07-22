@@ -10,6 +10,7 @@ import com.example.devs._core.utils.FileUtil;
 import com.example.devs.model.bookmark.Bookmark;
 import com.example.devs.model.bookmark.BookmarkRepository;
 import com.example.devs.model.bookmark.BookmarkService;
+import com.example.devs.model.like.LikeRepository;
 import com.example.devs.model.like.LikeService;
 import com.example.devs.model.photo.Photo;
 import com.example.devs.model.photo.PhotoRepository;
@@ -36,11 +37,9 @@ public class BoardService {
     private final UserRepository userRepository;
     private final LikeService likeService;
     private final BookmarkService bookmarkService;
-    private final BookmarkRepository bookmarkRepository;
-    private final ReplyRepository replyRepository;
     private final ReplyService replyService;
-    private final PhotoRepository photoRepository;
     private final PhotoService photoService;
+    private final LikeRepository likeRepository;
 
     //게시글 목록 불러오기 ( 일반 사용자용 )
     public Page<BoardResponse.ListDTO> getBoards(int page, int size, BoardRole boardRole, Integer userId) {
@@ -83,14 +82,14 @@ public class BoardService {
         // 게시글 북마크, 좋아요 여부
         Boolean isBookmarked = bookmarkService.isBookmarked(boardRole, boardId, userId);
         Boolean isLiked = likeService.isLiked(boardRole, boardId, userId);
-        System.out.println("Aaaaaaa : " + isBookmarked);
+        Integer likeCount = likeRepository.countByBoardId(boardId, BoardRole.Board, BoardStatus.PUBLISHED);
 
         //댓글 가져오기&이미지 가져오기
         List<BoardResponse.ReplyDTO> repliesDto = replyService.getReplies(boardRole, boardId, userId);
         List<BoardResponse.PhotoDTO> photoDTOs = photoService.getPhotos(boardId);
 
 
-        BoardResponse.DetailDTO dto = new BoardResponse.DetailDTO(board, repliesDto, photoDTOs, isBookmarked, isLiked);
+        BoardResponse.DetailDTO dto = new BoardResponse.DetailDTO(board, repliesDto, photoDTOs, isBookmarked, isLiked, likeCount);
         dto.setOwner(
                 board.getUser().getId().equals(userId) //이 글의 작성자이면 true로 셋팅
         );
