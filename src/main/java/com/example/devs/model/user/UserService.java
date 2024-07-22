@@ -152,23 +152,14 @@ public class UserService {
     }
 
     // OAuth 로그인
-    public String oauthLogin(UserProvider provider, String code) {
+    public String oauthLogin(UserProvider provider, String accessToken) {
         OAuthLoginService<?> loginService = getOAuthProvider(provider);
-        // UserResponse.OAuthTokenDTO tokenDTO = loginService.getAccessToken(code);
 
         if (provider == UserProvider.KAKAO) {
-            UserResponse.KakaoUserDTO userDTO = (UserResponse.KakaoUserDTO) loginService.getUserInfo(code);
-            // accessTokenStorage.saveToken(userDTO.getId().toString(), tokenDTO.getAccessToken());
-            // 액세스 토큰 출력
-            // accessTokenStorage.printAllTokens();
-            //
+            UserResponse.KakaoUserDTO userDTO = (UserResponse.KakaoUserDTO) loginService.getUserInfo(accessToken);
             return findOrSaveUser(userDTO, provider);
         } else if (provider == UserProvider.NAVER) {
-            UserResponse.NaverUserDTO userDTO = (UserResponse.NaverUserDTO) loginService.getUserInfo(code);
-            // accessTokenStorage.saveToken(userDTO.getResponse().getId(), tokenDTO.getAccessToken());
-            // 액세스 토큰 출력
-            // accessTokenStorage.printAllTokens();
-            //
+            UserResponse.NaverUserDTO userDTO = (UserResponse.NaverUserDTO) loginService.getUserInfo(accessToken);
             return findOrSaveUser(userDTO, provider);
         } else {
             throw new Exception404("지원하지 않는 OAuth 공급자입니다.");

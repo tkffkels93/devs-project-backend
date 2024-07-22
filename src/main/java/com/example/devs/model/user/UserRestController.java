@@ -23,10 +23,10 @@ public class UserRestController {
     // https://nid.naver.com/oauth2.0/authorize?redirect_uri=http://localhost:8080/api/users/oauth/naver&response_type=code&client_id=nfdBh7_HSSjdAvaBPLWs
     // OAuth 로그인
     @GetMapping("/oauth/{provider}")
-    public ResponseEntity<?> oauthLogin(@PathVariable("provider") String provider, @RequestParam("code") String code) {
+    public ResponseEntity<?> oauthLogin(@PathVariable("provider") String provider, @RequestParam("accessToken") String accessToken) {
         UserProvider userProvider;
         userProvider = UserProvider.valueOf(provider.toUpperCase());
-        String jwt = userService.oauthLogin(userProvider, code);
+        String jwt = userService.oauthLogin(userProvider, accessToken);
         System.out.println("########### JWT ###########: " + jwt.toString());
         return ResponseEntity.ok()
                 .header(JwtVO.HEADER, JwtVO.PREFIX + jwt)
