@@ -107,6 +107,19 @@ public class UserRestController {
         return ResponseEntity.ok().body(new ApiUtil<>(userProfileDTO));
     }
 
+    // 프로필 수정 데이터 전달
+    @GetMapping("/profile/update")
+    public ResponseEntity<?> getUpdateProfileInfo(HttpServletRequest request) {
+        //현재 접속한 사용자 아이디 가져오기
+        HttpSession session = request.getSession();
+        SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
+
+        // 사용자 데이터 조회
+        UserResponse.UpdateProfileInfoDTO updateProfileInfoDTO = userService.getUpdateProfileInfo(sessionUser.getId());
+
+        return ResponseEntity.ok().body(new ApiUtil<>(updateProfileInfoDTO));
+    }
+
     // 사용자 프로필 수정
     @PostMapping("/profile/update")
     public ResponseEntity<?> updateProfile(HttpServletRequest request,

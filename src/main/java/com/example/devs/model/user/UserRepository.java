@@ -45,12 +45,12 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Transactional
     @Modifying
     @Query("""
-       UPDATE User u
-       SET u.nickname = :nickname, u.position = :position, u.introduce = :introduce, u.image = :profileImg
-       WHERE u.id = :id
-        AND u.status = 'ACTIVE'
-        AND u.role = 'USER'
-       """)
+           UPDATE User u
+           SET u.nickname = :nickname, u.position = :position, u.introduce = :introduce, u.image = :profileImg
+           WHERE u.id = :id
+           AND u.status = 'ACTIVE'
+           AND u.role = 'USER'
+           """)
     Integer updateProfileById(@Param("id") Integer id,
                               @Param("nickname")String nickname,
                               @Param("position")String position,

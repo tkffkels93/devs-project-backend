@@ -228,4 +228,14 @@ public class UserResponse {
         }
     }
 
+    // 프로필 수정 DTO
+    @Data
+    @Builder
+    public static class UpdateProfileInfoDTO {
+        private String nickname;
+        private String position;
+        private String introduce;
+        private String profileImg;
+    }
+
 }

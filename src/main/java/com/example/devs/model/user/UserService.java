@@ -363,6 +363,22 @@ public class UserService {
         return myReplyList;
     }
 
+    // 프로필 수정 정보 조회 및 전달
+    public UserResponse.UpdateProfileInfoDTO getUpdateProfileInfo(Integer id) {
+        // 사용자 정보 조회
+        Optional<User> user = userRepository.findById(id);
+
+        // DTO 생성 및 값 설정
+        UserResponse.UpdateProfileInfoDTO updateProfileInfoDTO = UserResponse.UpdateProfileInfoDTO.builder()
+               .nickname(user.get().getNickname())
+               .position(user.get().getPosition())
+               .introduce(user.get().getIntroduce())
+               .profileImg(user.get().getImage())
+               .build();
+
+        return updateProfileInfoDTO;
+    }
+
     // 프로필 업데이트
     public Integer updateProfile(Integer id, UserRequest.UpdateProfileDTO updateProfileDTO) {
         // 업데이트 정보 DB에 전달
@@ -375,4 +391,5 @@ public class UserService {
         // 결과 반환: 1 (성공), 0 (실패)
         return result;
     }
+
 }
