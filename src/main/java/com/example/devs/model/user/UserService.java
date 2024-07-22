@@ -152,23 +152,14 @@ public class UserService {
     }
 
     // OAuth 로그인
-    public String oauthLogin(UserProvider provider, String code) {
+    public String oauthLogin(UserProvider provider, String accessToken) {
         OAuthLoginService<?> loginService = getOAuthProvider(provider);
-        // UserResponse.OAuthTokenDTO tokenDTO = loginService.getAccessToken(code);
 
         if (provider == UserProvider.KAKAO) {
-            UserResponse.KakaoUserDTO userDTO = (UserResponse.KakaoUserDTO) loginService.getUserInfo(code);
-            // accessTokenStorage.saveToken(userDTO.getId().toString(), tokenDTO.getAccessToken());
-            // 액세스 토큰 출력
-            // accessTokenStorage.printAllTokens();
-            //
+            UserResponse.KakaoUserDTO userDTO = (UserResponse.KakaoUserDTO) loginService.getUserInfo(accessToken);
             return findOrSaveUser(userDTO, provider);
         } else if (provider == UserProvider.NAVER) {
-            UserResponse.NaverUserDTO userDTO = (UserResponse.NaverUserDTO) loginService.getUserInfo(code);
-            // accessTokenStorage.saveToken(userDTO.getResponse().getId(), tokenDTO.getAccessToken());
-            // 액세스 토큰 출력
-            // accessTokenStorage.printAllTokens();
-            //
+            UserResponse.NaverUserDTO userDTO = (UserResponse.NaverUserDTO) loginService.getUserInfo(accessToken);
             return findOrSaveUser(userDTO, provider);
         } else {
             throw new Exception404("지원하지 않는 OAuth 공급자입니다.");
@@ -371,4 +362,34 @@ public class UserService {
 
         return myReplyList;
     }
+
+    // 프로필 수정 정보 조회 및 전달
+    public UserResponse.UpdateProfileInfoDTO getUpdateProfileInfo(Integer id) {
+        // 사용자 정보 조회
+        Optional<User> user = userRepository.findById(id);
+
+        // DTO 생성 및 값 설정
+        UserResponse.UpdateProfileInfoDTO updateProfileInfoDTO = UserResponse.UpdateProfileInfoDTO.builder()
+               .nickname(user.get().getNickname())
+               .position(user.get().getPosition())
+               .introduce(user.get().getIntroduce())
+               .profileImg(user.get().getImage())
+               .build();
+
+        return updateProfileInfoDTO;
+    }
+
+    // 프로필 업데이트
+    public Integer updateProfile(Integer id, UserRequest.UpdateProfileDTO updateProfileDTO) {
+        // 업데이트 정보 DB에 전달
+        Integer result = userRepository.updateProfileById(id,
+                                                          updateProfileDTO.getNickname(),
+                                                          updateProfileDTO.getPosition(),
+                                                          updateProfileDTO.getIntroduce(),
+                                                          updateProfileDTO.getProfileImg());
+
+        // 결과 반환: 1 (성공), 0 (실패)
+        return result;
+    }
+
 }

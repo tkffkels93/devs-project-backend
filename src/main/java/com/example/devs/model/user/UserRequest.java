@@ -44,4 +44,13 @@ public class UserRequest {
         private UserProvider provider = UserProvider.EMAIL;
         private String providerId = null;
     }
+
+    // 프로필 수정 DTO
+    @Data
+    public static class UpdateProfileDTO {
+        private String nickname;
+        private String position;
+        private String introduce;
+        private String profileImg;
+    }
 }
