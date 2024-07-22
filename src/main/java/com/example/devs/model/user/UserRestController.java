@@ -129,14 +129,8 @@ public class UserRestController {
         SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
 
         // 업데이트
-        Integer result = userService.updateProfile(sessionUser.getId(), updateProfileDTO);
+        UserResponse.UpdateProfileInfoDTO updateProfileInfoDTO = userService.updateProfile(sessionUser.getId(), updateProfileDTO);
 
-        if (result == 1) {
-            // 업데이트 성공
-            return ResponseEntity.ok(new ApiUtil<>(null));
-        }else {
-            // 업데이트 실패
-            return ResponseEntity.status(400).body(new ApiUtil<>(400, "업데이트 실패"));
-        }
+        return ResponseEntity.ok(new ApiUtil<>(updateProfileInfoDTO));
     }
 }
