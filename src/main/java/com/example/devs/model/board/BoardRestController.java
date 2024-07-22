@@ -50,6 +50,16 @@ public class BoardRestController {
         return ResponseEntity.ok(new ApiUtil<>(dto));
     }
 
+    @PostMapping("/{boardId}/update")
+    public ResponseEntity<?> boardWrite(HttpServletRequest request,
+                                        @PathVariable Integer boardId,
+                                        @RequestBody BoardRequest.Write writeDto) throws IOException {
+        HttpSession session = request.getSession();
+        SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
+        boardService.writeBoard(sessionUser.getId(),writeDto);
+        return ResponseEntity.ok(new ApiUtil<>(null));
+    }
+
     @PostMapping("/write")
     public ResponseEntity<?> boardWrite(HttpServletRequest request, @RequestBody BoardRequest.Write writeDto) throws IOException {
         HttpSession session = request.getSession();
