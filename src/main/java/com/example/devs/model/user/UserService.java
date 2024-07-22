@@ -8,6 +8,7 @@ import com.example.devs._core.errors.exception.Exception401;
 import com.example.devs._core.errors.exception.Exception403;
 import com.example.devs._core.errors.exception.Exception404;
 import com.example.devs._core.utils.EncryptUtil;
+import com.example.devs._core.utils.ImageUtil;
 import com.example.devs._core.utils.JwtUtil;
 import com.example.devs._core.utils.LocalDateTimeFormatter;
 import com.example.devs.model.board.Board;
@@ -207,19 +208,21 @@ public class UserService {
 
             if (provider == UserProvider.KAKAO) {
                 UserResponse.KakaoUserDTO kakaoUser = (UserResponse.KakaoUserDTO) userDTO;
+                String saveImageName = ImageUtil.downloadImage(kakaoUser.getProperties().getProfileImage());
                 nickname = kakaoUser.getProperties().getNickname();
                 username = kakaoUser.getProperties().getNickname();
                 phone = "010-1234-5678"; // 임의로 설정
                 birth = LocalDate.now(); // 임의로 설정
-                profileImage = kakaoUser.getProperties().getProfileImage();
+                profileImage = saveImageName;
                 providerId = kakaoUser.getId().toString();
             } else {
                 UserResponse.NaverUserDTO naverUser = (UserResponse.NaverUserDTO) userDTO;
+                String saveImageName = ImageUtil.downloadImage(naverUser.getResponse().getProfileImage());
                 nickname = naverUser.getResponse().getNickname();
                 username = naverUser.getResponse().getName();
                 phone = naverUser.getResponse().getMobile();
                 birth = LocalDateTimeFormatter.parseBirth(naverUser.getResponse().getBirthyear(), naverUser.getResponse().getBirthday());
-                profileImage = naverUser.getResponse().getProfileImage();
+                profileImage = saveImageName;
                 providerId = naverUser.getResponse().getId();
             }
 
