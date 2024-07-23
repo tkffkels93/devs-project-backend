@@ -62,7 +62,8 @@ public class ImageUtil {
         }
 
         // UUID를 사용하여 고유한 파일 이름 생성
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        String fileExtension = FileUtil.getFileExtension(file.getOriginalFilename());
+        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename() + fileExtension;
 
         // 지정된 디렉토리에 파일 경로 생성
         Path filePath = Paths.get("./upload", fileName);
@@ -170,5 +171,41 @@ public class ImageUtil {
             return null;
         }
         return "/upload/" + fileName;
+    }
+
+    // byte[] 배열과 파일 이름을 받아 파일을 업로드하는 메서드
+    public static FileUploadResult uploadFile(byte[] fileData, String originalFileName) {
+        // 파일이 이미지이 아닌 경우 예외를 던짐
+        if (!isImageFile(originalFileName)) {
+            throw new IllegalArgumentException("이미지 또는 영상 파일만 업로드할 수 있습니다.");
+        }
+
+        // UUID를 사용하여 고유한 파일 이름 생성
+        String fileExtension = FileUtil.getFileExtension(originalFileName);
+        String fileName = UUID.randomUUID() + "_" + originalFileName + fileExtension;
+
+        // 지정된 디렉토리에 파일 경로 생성
+        Path filePath = Paths.get("./upload", fileName);
+
+        try {
+            // 업로드 디렉토리가 존재하지 않으면 생성
+            Files.createDirectories(filePath.getParent());
+            // 지정된 경로에 파일 작성
+            Files.write(filePath, fileData);
+
+        } catch (Exception e) {
+            // 오류가 발생하면 스택 트레이스를 출력하고 런타임 예외를 던짐
+            e.printStackTrace();
+            throw new RuntimeException("파일 업로드 중 오류 발생: " + e.getMessage());
+        }
+
+        // 파일 업로드 결과를 반환
+        return new FileUploadResult(fileName, filePath.toString());
+    }
+
+    // 파일 이름으로 파일이 이미지인지 확인하는 메서드 (확장자로 확인)
+    private static boolean isImageFile(String fileName) {
+        String fileExtension = FileUtil.getFileExtension(fileName).toLowerCase();
+        return fileExtension.equals(".jpg") || fileExtension.equals(".jpeg") || fileExtension.equals(".png") || fileExtension.equals(".gif");
     }
 }

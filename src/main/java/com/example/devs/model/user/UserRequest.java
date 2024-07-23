@@ -6,7 +6,6 @@ import com.example.devs.model.board.BoardRequest;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.List;
 
 public class UserRequest {
 
@@ -53,6 +52,16 @@ public class UserRequest {
         private String nickname;
         private String position;
         private String introduce;
-        private List<BoardRequest.Base64Image> profileImg;
+        private BoardRequest.Base64Image profileImg;
+    }
+
+    @Data
+    public static class Base64Image{
+        private String imageData;
+        private String fileName;
+        public Base64Image(String imageData, String fileName) {
+            this.imageData = imageData;
+            this.fileName = fileName;
+        }
     }
 }
