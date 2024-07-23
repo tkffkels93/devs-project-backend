@@ -61,7 +61,7 @@ public interface BoardRepository extends JpaRepository<Board, Integer> {
        LEFT JOIN Like l ON b.id = l.board.id AND l.boardRole = :boardRole
        LEFT JOIN Bookmark k ON b.id = k.board.id AND k.boardRole = :boardRole
        LEFT JOIN Reply r ON b.id = r.board.id AND r.boardRole = :boardRole
-       WHERE b.BoardRole = :boardRole AND b.title LIKE %:query%
+       WHERE b.BoardRole = :boardRole AND LOWER(b.title) LIKE LOWER(CONCAT('%', :query, '%'))
        GROUP BY b
        ORDER BY b.id DESC
        """)
