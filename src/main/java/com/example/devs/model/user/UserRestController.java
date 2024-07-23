@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -123,7 +124,7 @@ public class UserRestController {
     // 사용자 프로필 수정
     @PutMapping("/profile/update")
     public ResponseEntity<?> updateProfile(HttpServletRequest request,
-                                           @RequestBody UserRequest.UpdateProfileDTO updateProfileDTO) {
+                                           @RequestBody UserRequest.UpdateProfileDTO updateProfileDTO) throws IOException {
         //현재 접속한 사용자 아이디 가져오기
         HttpSession session = request.getSession();
         SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");

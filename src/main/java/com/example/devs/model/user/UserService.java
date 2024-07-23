@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -385,13 +386,17 @@ public class UserService {
     }
 
     // 프로필 업데이트
-    public UserResponse.UpdateProfileInfoDTO updateProfile(Integer id, UserRequest.UpdateProfileDTO resquestDTO) {
+    public UserResponse.UpdateProfileInfoDTO updateProfile(Integer id, UserRequest.UpdateProfileDTO resquestDTO) throws IOException {
+        // 사진 인코딩
+        List<ImageUtil.FileUploadResult> fileUploadResults = ImageUtil.uploadBase64Images(resquestDTO.getProfileImg());
+        String profileImg = fileUploadResults.get(0).getFilePath() + fileUploadResults.get(0).getFileName();
+
         // 업데이트 정보 DB에 전달
         Integer result = userRepository.updateProfileById(id,
                                                           resquestDTO.getNickname(),
                                                           resquestDTO.getPosition(),
                                                           resquestDTO.getIntroduce(),
-                                                          resquestDTO.getProfileImg());
+                                                          profileImg);
 
         // 업데이트 실패
         if (result != 1) { throw new Exception400("업데이트 실패."); }
@@ -401,7 +406,7 @@ public class UserService {
                 .nickname(resquestDTO.getNickname())
                 .position(resquestDTO.getPosition())
                 .introduce(resquestDTO.getIntroduce())
-                .profileImg(resquestDTO.getProfileImg())
+                .profileImg(profileImg)
                 .build();
     }
 

@@ -2,9 +2,11 @@ package com.example.devs.model.user;
 
 import com.example.devs._core.enums.UserProvider;
 import com.example.devs._core.enums.UserRole;
+import com.example.devs.model.board.BoardRequest;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class UserRequest {
 
@@ -51,6 +53,6 @@ public class UserRequest {
         private String nickname;
         private String position;
         private String introduce;
-        private String profileImg;
+        private List<BoardRequest.Base64Image> profileImg;
     }
 }
