@@ -51,6 +51,13 @@ public class UserRequest {
         private String nickname;
         private String position;
         private String introduce;
-        private String profileImg;
+        private Base64Image profileImg;
+
+        @Data
+        public static class Base64Image {
+            private String imageData;
+            private String fileName;
+        }
     }
+
 }
