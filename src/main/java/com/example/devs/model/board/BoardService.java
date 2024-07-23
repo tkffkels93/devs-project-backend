@@ -6,8 +6,10 @@ import com.example.devs._core.errors.exception.Exception400;
 import com.example.devs._core.errors.exception.Exception401;
 import com.example.devs._core.errors.exception.Exception403;
 import com.example.devs._core.errors.exception.Exception404;
-import com.example.devs._core.utils.FileUtil;
+import com.example.devs._core.utils.ImageUtil;
+import com.example.devs.model.bookmark.BookmarkRepository;
 import com.example.devs.model.bookmark.BookmarkService;
+import com.example.devs.model.like.LikeRepository;
 import com.example.devs.model.like.LikeService;
 import com.example.devs.model.photo.Photo;
 import com.example.devs.model.photo.PhotoRepository;
@@ -21,10 +23,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @RequiredArgsConstructor
@@ -34,13 +36,11 @@ public class BoardService {
     private final UserRepository userRepository;
     private final LikeService likeService;
     private final BookmarkService bookmarkService;
-    private final ReplyRepository replyRepository;
     private final ReplyService replyService;
-    private final PhotoRepository photoRepository;
     private final PhotoService photoService;
+    private final LikeRepository likeRepository;
 
     //게시글 목록 불러오기 ( 일반 사용자용 )
-    @Transactional
     public Page<BoardResponse.ListDTO> getBoards(int page, int size, BoardRole boardRole, Integer userId) {
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable = PageRequest.of(page, size, sort);
@@ -59,30 +59,33 @@ public class BoardService {
             dto.setLikeCount(likeCount);
             dto.setBookmarkCount(bookmarkCount);
             dto.setReplyCount(replyCount);
-            if (board.getUser().getId().equals(userId)) { //이 게시글이 내가 쓴 글이면
-                //좋아요 눌렀는지 확인 후 true/false 설정
-                dto.setMyLike( likeService.isLiked(boardRole, board.getId(), userId) );
-                dto.setMyBookmark( bookmarkService.isBookmarked(boardRole, board.getId(), userId) );
-            }
+            dto.setMyLike(likeService.isLiked(boardRole, board.getId(), userId));
+            dto.setMyBookmark(bookmarkService.isBookmarked(boardRole, board.getId(), userId));
             boardDtoList.add(dto);
         }
         return new PageImpl<>(boardDtoList, pageable, boards.getTotalElements());
     }
 
     //게시글 내용 불러오기 ( 일반 사용자용 )
-    @Transactional
     public BoardResponse.DetailDTO getBoardDetail(BoardRole boardRole, Integer boardId, Integer userId) {
         Board board = boardRepository.findByBoardRoleAndId(boardRole, boardId)
                 .orElseThrow(() -> new Exception404("게시물을 찾을 수 없습니다."));
         //조회수 증가 --> 본인이 작성한 글을 조회하는 경우에는 조회수가 증가하지 않음
         if (!board.getUser().getId().equals(userId)) {
-            board.setHit( board.getHit() + 1 );
+            board.setHit(board.getHit() + 1);
         }
+
+        // 게시글 북마크, 좋아요 여부
+        Boolean isBookmarked = bookmarkService.isBookmarked(boardRole, boardId, userId);
+        Boolean isLiked = likeService.isLiked(boardRole, boardId, userId);
+        Integer likeCount = likeRepository.countByBoardId(boardId, BoardRole.Board, BoardStatus.PUBLISHED);
 
         //댓글 가져오기&이미지 가져오기
         List<BoardResponse.ReplyDTO> repliesDto = replyService.getReplies(boardRole, boardId, userId);
         List<BoardResponse.PhotoDTO> photoDTOs = photoService.getPhotos(boardId);
-        BoardResponse.DetailDTO dto = new BoardResponse.DetailDTO(board, repliesDto, photoDTOs);
+
+
+        BoardResponse.DetailDTO dto = new BoardResponse.DetailDTO(board, repliesDto, photoDTOs, isBookmarked, isLiked, likeCount);
         dto.setOwner(
                 board.getUser().getId().equals(userId) //이 글의 작성자이면 true로 셋팅
         );
@@ -90,7 +93,6 @@ public class BoardService {
     }
 
     //인기 게시글 목록(top10) 가져오기
-    @Transactional
     public List<BoardResponse.Top10ListDTO> getTop10Boards(BoardRole boardRole) {
         List<Board> boards = boardRepository.findTop10ByBoardRole(boardRole);
         AtomicInteger counter = new AtomicInteger(1);
@@ -170,60 +172,33 @@ public class BoardService {
         board.setStatus(BoardStatus.DELETED);
         boardRepository.save(board);
     }
+
     //일반사용자용 게시글 작성하기
+    @Transactional
     public void writeBoard(Integer userId, BoardRequest.Write writeDto) throws IOException {
 
         //게시글 먼저 저장. 이미지는 아래에 따로 저장
         Board board = Board.builder()
-                        .title(writeDto.getTitle())
-                        .content(writeDto.getContent())
-                        .hit(0)
-                        .boardRole(BoardRole.Board)
-                        .status(BoardStatus.PUBLISHED)
-                        .user(User.builder().id(userId).build())
+                .title(writeDto.getTitle())
+                .content(writeDto.getContent())
+                .hit(0)
+                .boardRole(BoardRole.Board)
+                .status(BoardStatus.PUBLISHED)
+                .user(User.builder().id(userId).build())
+                .build();
+        board = boardRepository.save(board);
+
+        List<ImageUtil.FileUploadResult> fileUploadResults;
+        if ( writeDto.getImages() != null ) {
+            fileUploadResults = ImageUtil.uploadBase64Images(writeDto.getImages());
+            for( ImageUtil.FileUploadResult fileUploadResult : fileUploadResults) {
+                Photo photo = Photo.builder()
+                        .board(board)
+                        .fileName(fileUploadResult.getFileName())
+                        .filePath(fileUploadResult.getFilePath())
                         .build();
-        board=boardRepository.save(board);
-
-        List<BoardRequest.Base64Image> base64Images = writeDto.getImages();
-
-        // 1. JSON으로 전달된 이미지를 순회하며 파일로 저장,
-        // 2. Photo_tb에 저장
-        for (BoardRequest.Base64Image image : base64Images) {
-
-            //1
-            byte[] imageBytes;
-            try {
-                imageBytes = Base64.getDecoder().decode(image.getImageData());
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Invalid Base64 data for image: " + image.getFileName(), e);
+                photoService.savePhoto(photo);
             }
-
-            String originalFileName = image.getFileName();
-            String fileExtension = FileUtil.getFileExtension(originalFileName);
-            String uuidFileName = UUID.randomUUID().toString() + fileExtension;
-
-            // 저장할 디렉토리 경로 설정
-            String directoryPath = "upload/";
-            File directory = new File(directoryPath);
-            if (!directory.exists()) {
-                directory.mkdirs(); // 디렉토리가 존재하지 않으면 생성
-            }
-
-            String filePath = directoryPath + uuidFileName;
-
-            try (FileOutputStream fos = new FileOutputStream(new File(filePath))) {
-                fos.write(imageBytes);
-            } catch (IOException e) {
-                throw new IOException("Failed to save image: " + originalFileName, e);
-            }
-
-            //2
-            Photo photo = Photo.builder()
-                    .board(board)
-                    .fileName(uuidFileName)
-                    .filePath(filePath)
-                    .build();
-            photoService.savePhoto(photo);
         }
     }
 
@@ -247,8 +222,8 @@ public class BoardService {
             dto.setReplyCount(replyCount);
             if (board.getUser().getId().equals(userId)) { //이 게시글이 내가 쓴 글이면
                 //좋아요 눌렀는지 확인 후 true/false 설정
-                dto.setMyLike( likeService.isLiked(boardRole, board.getId(), userId) );
-                dto.setMyBookmark( bookmarkService.isBookmarked(boardRole, board.getId(), userId) );
+                dto.setMyLike(likeService.isLiked(boardRole, board.getId(), userId));
+                dto.setMyBookmark(bookmarkService.isBookmarked(boardRole, board.getId(), userId));
             }
             boardDtoList.add(dto);
         }

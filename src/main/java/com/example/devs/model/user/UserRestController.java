@@ -23,10 +23,10 @@ public class UserRestController {
     // https://nid.naver.com/oauth2.0/authorize?redirect_uri=http://localhost:8080/api/users/oauth/naver&response_type=code&client_id=nfdBh7_HSSjdAvaBPLWs
     // OAuth 로그인
     @GetMapping("/oauth/{provider}")
-    public ResponseEntity<?> oauthLogin(@PathVariable("provider") String provider, @RequestParam("code") String code) {
+    public ResponseEntity<?> oauthLogin(@PathVariable("provider") String provider, @RequestParam("accessToken") String accessToken) {
         UserProvider userProvider;
         userProvider = UserProvider.valueOf(provider.toUpperCase());
-        String jwt = userService.oauthLogin(userProvider, code);
+        String jwt = userService.oauthLogin(userProvider, accessToken);
         System.out.println("########### JWT ###########: " + jwt.toString());
         return ResponseEntity.ok()
                 .header(JwtVO.HEADER, JwtVO.PREFIX + jwt)
@@ -105,5 +105,32 @@ public class UserRestController {
         Pageable pageable = PageRequest.of(page - 1, size); // 클라이언트는 1부터 시작, 서버는 0부터 시작
         UserResponse.UserProfileDTO userProfileDTO = userService.getUserProfile(userId, pageable);
         return ResponseEntity.ok().body(new ApiUtil<>(userProfileDTO));
+    }
+
+    // 프로필 수정 데이터 전달
+    @GetMapping("/profile/update")
+    public ResponseEntity<?> getUpdateProfileInfo(HttpServletRequest request) {
+        //현재 접속한 사용자 아이디 가져오기
+        HttpSession session = request.getSession();
+        SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
+
+        // 사용자 데이터 조회
+        UserResponse.UpdateProfileInfoDTO updateProfileInfoDTO = userService.getUpdateProfileInfo(sessionUser.getId());
+
+        return ResponseEntity.ok().body(new ApiUtil<>(updateProfileInfoDTO));
+    }
+
+    // 사용자 프로필 수정
+    @PutMapping("/profile/update")
+    public ResponseEntity<?> updateProfile(HttpServletRequest request,
+                                           @RequestBody UserRequest.UpdateProfileDTO updateProfileDTO) {
+        //현재 접속한 사용자 아이디 가져오기
+        HttpSession session = request.getSession();
+        SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
+
+        // 업데이트
+        UserResponse.UpdateProfileInfoDTO updateProfileInfoDTO = userService.updateProfile(sessionUser.getId(), updateProfileDTO);
+
+        return ResponseEntity.ok(new ApiUtil<>(updateProfileInfoDTO));
     }
 }

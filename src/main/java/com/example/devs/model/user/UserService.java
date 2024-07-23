@@ -8,6 +8,7 @@ import com.example.devs._core.errors.exception.Exception401;
 import com.example.devs._core.errors.exception.Exception403;
 import com.example.devs._core.errors.exception.Exception404;
 import com.example.devs._core.utils.EncryptUtil;
+import com.example.devs._core.utils.ImageUtil;
 import com.example.devs._core.utils.JwtUtil;
 import com.example.devs._core.utils.LocalDateTimeFormatter;
 import com.example.devs.model.board.Board;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,6 +34,8 @@ public class UserService {
     private final BoardRepository boardRepository;
     private final List<OAuthLoginService> oAuthLoginServices;
     private final AccessTokenStorage accessTokenStorage;
+
+    static final String BASIC_IMAGE_PATH = "/src/main/resources/static/images/profile_basic.png";
 
     // 로그인 (관리자)
     @Transactional
@@ -141,7 +145,7 @@ public class UserService {
                 .username(joinDTO.getUsername())
                 .phone(joinDTO.getPhone())
                 .birth(bod)
-                .image(null)
+                .image(BASIC_IMAGE_PATH)
                 .introduce(joinDTO.getIntroduce())
                 .position(joinDTO.getPosition())
                 .role(UserRole.USER)
@@ -152,23 +156,14 @@ public class UserService {
     }
 
     // OAuth 로그인
-    public String oauthLogin(UserProvider provider, String code) {
+    public String oauthLogin(UserProvider provider, String accessToken) {
         OAuthLoginService<?> loginService = getOAuthProvider(provider);
-        UserResponse.OAuthTokenDTO tokenDTO = loginService.getAccessToken(code);
 
         if (provider == UserProvider.KAKAO) {
-            UserResponse.KakaoUserDTO userDTO = (UserResponse.KakaoUserDTO) loginService.getUserInfo(tokenDTO.getAccessToken());
-            accessTokenStorage.saveToken(userDTO.getId().toString(), tokenDTO.getAccessToken());
-            // 액세스 토큰 출력
-            accessTokenStorage.printAllTokens();
-            //
+            UserResponse.KakaoUserDTO userDTO = (UserResponse.KakaoUserDTO) loginService.getUserInfo(accessToken);
             return findOrSaveUser(userDTO, provider);
         } else if (provider == UserProvider.NAVER) {
-            UserResponse.NaverUserDTO userDTO = (UserResponse.NaverUserDTO) loginService.getUserInfo(tokenDTO.getAccessToken());
-            accessTokenStorage.saveToken(userDTO.getResponse().getId(), tokenDTO.getAccessToken());
-            // 액세스 토큰 출력
-            accessTokenStorage.printAllTokens();
-            //
+            UserResponse.NaverUserDTO userDTO = (UserResponse.NaverUserDTO) loginService.getUserInfo(accessToken);
             return findOrSaveUser(userDTO, provider);
         } else {
             throw new Exception404("지원하지 않는 OAuth 공급자입니다.");
@@ -214,19 +209,21 @@ public class UserService {
 
             if (provider == UserProvider.KAKAO) {
                 UserResponse.KakaoUserDTO kakaoUser = (UserResponse.KakaoUserDTO) userDTO;
+                String saveImageName = ImageUtil.downloadImage(kakaoUser.getProperties().getProfileImage());
                 nickname = kakaoUser.getProperties().getNickname();
                 username = kakaoUser.getProperties().getNickname();
                 phone = "010-1234-5678"; // 임의로 설정
                 birth = LocalDate.now(); // 임의로 설정
-                profileImage = kakaoUser.getProperties().getProfileImage();
+                profileImage = saveImageName;
                 providerId = kakaoUser.getId().toString();
             } else {
                 UserResponse.NaverUserDTO naverUser = (UserResponse.NaverUserDTO) userDTO;
+                String saveImageName = ImageUtil.downloadImage(naverUser.getResponse().getProfileImage());
                 nickname = naverUser.getResponse().getNickname();
                 username = naverUser.getResponse().getName();
                 phone = naverUser.getResponse().getMobile();
                 birth = LocalDateTimeFormatter.parseBirth(naverUser.getResponse().getBirthyear(), naverUser.getResponse().getBirthday());
-                profileImage = naverUser.getResponse().getProfileImage();
+                profileImage = saveImageName;
                 providerId = naverUser.getResponse().getId();
             }
 
@@ -371,4 +368,51 @@ public class UserService {
 
         return myReplyList;
     }
+
+    // 프로필 수정 정보 조회 및 전달
+    public UserResponse.UpdateProfileInfoDTO getUpdateProfileInfo(Integer id) {
+        // 사용자 정보 조회
+        Optional<User> user = userRepository.findById(id);
+
+        // DTO 생성 및 값 설정
+        UserResponse.UpdateProfileInfoDTO updateProfileInfoDTO = UserResponse.UpdateProfileInfoDTO.builder()
+               .nickname(user.get().getNickname())
+               .position(user.get().getPosition())
+               .introduce(user.get().getIntroduce())
+               .profileImg(user.get().getImage())
+               .build();
+
+        return updateProfileInfoDTO;
+    }
+
+    // 프로필 업데이트
+    public UserResponse.UpdateProfileInfoDTO updateProfile(Integer id, UserRequest.UpdateProfileDTO resquestDTO) {
+        // Base64 디코딩
+        byte[] decodedBytes = Base64.getDecoder().decode(resquestDTO.getProfileImg().getImageData());
+
+        // 파일 업로드
+        ImageUtil.FileUploadResult fileUploadResult = ImageUtil.uploadFile(decodedBytes, resquestDTO.getProfileImg().getFileName());
+
+        // 파일 경로 추출
+        String filePath = fileUploadResult.getFilePath();
+
+        // 업데이트 정보 DB에 전달
+        Integer result = userRepository.updateProfileById(id,
+                                                          resquestDTO.getNickname(),
+                                                          resquestDTO.getPosition(),
+                                                          resquestDTO.getIntroduce(),
+                                                          filePath);
+
+        // 업데이트 실패
+        if (result != 1) { throw new Exception400("업데이트 실패."); }
+
+        // 결과 반환
+        return UserResponse.UpdateProfileInfoDTO.builder()
+                .nickname(resquestDTO.getNickname())
+                .position(resquestDTO.getPosition())
+                .introduce(resquestDTO.getIntroduce())
+                .profileImg(filePath)
+                .build();
+    }
+
 }

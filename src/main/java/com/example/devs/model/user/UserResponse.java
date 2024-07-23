@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -225,6 +226,24 @@ public class UserResponse {
             private String title;     // 제목
             private String content;   // 내용
             private String createdAt; // 작성일
+        }
+    }
+
+    // 프로필 수정 DTO
+    @Data
+    @Builder
+    @NoArgsConstructor
+    public static class UpdateProfileInfoDTO {
+        private String nickname;
+        private String position;
+        private String introduce;
+        private String profileImg;
+
+        public UpdateProfileInfoDTO(String nickname, String position, String introduce, String profileImg) {
+            this.nickname = nickname;
+            this.position = position;
+            this.introduce = introduce;
+            this.profileImg = profileImg;
         }
     }
 

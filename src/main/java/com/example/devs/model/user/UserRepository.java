@@ -5,9 +5,11 @@ import com.example.devs._core.enums.UserRole;
 import com.example.devs._core.enums.UserStatus;
 import com.example.devs.model.board.Board;
 import com.example.devs.model.reply.Reply;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -38,4 +40,20 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     // 내가 작성한 댓글 조회
     @Query("SELECT r FROM Reply r JOIN r.board b WHERE r.user.id = :id")
     Page<Reply> findMyRepliesById(@Param("id") Integer id, Pageable pageable);
+
+    // 사용자 프로필 업데이트
+    @Transactional
+    @Modifying
+    @Query("""
+           UPDATE User u
+           SET u.nickname = :nickname, u.position = :position, u.introduce = :introduce, u.image = :profileImg
+           WHERE u.id = :id
+           AND u.status = 'ACTIVE'
+           AND u.role = 'USER'
+           """)
+    Integer updateProfileById(@Param("id") Integer id,
+                              @Param("nickname")String nickname,
+                              @Param("position")String position,
+                              @Param("introduce")String introduce,
+                              @Param("profileImg")String profileImg);
 }
