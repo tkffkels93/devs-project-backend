@@ -59,11 +59,8 @@ public class BoardService {
             dto.setLikeCount(likeCount);
             dto.setBookmarkCount(bookmarkCount);
             dto.setReplyCount(replyCount);
-            if (board.getUser().getId().equals(userId)) { //이 게시글이 내가 쓴 글이면
-                //좋아요 눌렀는지 확인 후 true/false 설정
-                dto.setMyLike(likeService.isLiked(boardRole, board.getId(), userId));
-                dto.setMyBookmark(bookmarkService.isBookmarked(boardRole, board.getId(), userId));
-            }
+            dto.setMyLike(likeService.isLiked(boardRole, board.getId(), userId));
+            dto.setMyBookmark(bookmarkService.isBookmarked(boardRole, board.getId(), userId));
             boardDtoList.add(dto);
         }
         return new PageImpl<>(boardDtoList, pageable, boards.getTotalElements());
