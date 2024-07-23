@@ -394,7 +394,7 @@ public class UserService {
         ImageUtil.FileUploadResult fileUploadResult = ImageUtil.uploadFile(decodedBytes, resquestDTO.getProfileImg().getFileName());
 
         // 파일 경로 추출
-        String filePath = fileUploadResult.getFilePath() + fileUploadResult.getFileName();
+        String filePath = fileUploadResult.getFilePath();
 
         // 업데이트 정보 DB에 전달
         Integer result = userRepository.updateProfileById(id,

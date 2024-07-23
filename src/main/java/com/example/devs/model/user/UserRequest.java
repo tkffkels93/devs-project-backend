@@ -57,14 +57,7 @@ public class UserRequest {
         public static class Base64Image {
             private String imageData;
             private String fileName;
-
-            public Base64Image(String imageData, String fileName) {
-                this.imageData = imageData;
-                this.fileName = fileName;
-            }
         }
-
-
     }
 
 }
