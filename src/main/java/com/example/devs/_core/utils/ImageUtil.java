@@ -182,7 +182,7 @@ public class ImageUtil {
 
         // UUID를 사용하여 고유한 파일 이름 생성
         String fileExtension = FileUtil.getFileExtension(originalFileName);
-        String fileName = UUID.randomUUID() + "_" + originalFileName + fileExtension;
+        String fileName = UUID.randomUUID() + fileExtension;
 
         // 지정된 디렉토리에 파일 경로 생성
         Path filePath = Paths.get("./upload", fileName);
