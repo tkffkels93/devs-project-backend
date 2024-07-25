@@ -128,8 +128,8 @@ public class ImageUtil {
                 } catch (IOException e) {
                     throw new IOException("Failed to save image: " + originalFileName, e);
                 }
-                String filePath2 = "/upload/" + uuidFileName;
-                uploadResults.add( new FileUploadResult(uuidFileName, filePath2) );
+                String filePath2 =  "/" + "/upload/" + uuidFileName;
+                uploadResults.add(new FileUploadResult(uuidFileName, filePath2) );
             }
             for (FileUploadResult result : uploadResults) {
                 System.out.println("result.getFileName() = " + result.getFileName());
