@@ -148,8 +148,9 @@ public class BoardResponse {
         private Integer replyCount;
         private List<ReplyDTO> replies;
         private List<PhotoDTO> images;
+        private String sessionUserImg;
 
-        public DetailDTO(Board board, List<ReplyDTO> replies, List<PhotoDTO> images, Boolean myBookmark, Boolean myLike, Integer likeCount) {
+        public DetailDTO(Board board, List<ReplyDTO> replies, List<PhotoDTO> images, Boolean myBookmark, Boolean myLike, Integer likeCount, String sessionUserImg) {
             this.boardId = board.getId();
             this.boardTitle = board.getTitle();
             this.boardContent = board.getContent();
@@ -168,6 +169,7 @@ public class BoardResponse {
             this.replyCount = replies.size();
             this.replies = replies;
             this.images = images;
+            this.sessionUserImg = sessionUserImg;
         }
     }
 

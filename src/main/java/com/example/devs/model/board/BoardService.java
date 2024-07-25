@@ -68,6 +68,8 @@ public class BoardService {
 
     //게시글 내용 불러오기 ( 일반 사용자용 )
     public BoardResponse.DetailDTO getBoardDetail(BoardRole boardRole, Integer boardId, Integer userId) {
+        User user = userRepository.findById(userId).get();
+
         Board board = boardRepository.findByBoardRoleAndId(boardRole, boardId)
                 .orElseThrow(() -> new Exception404("게시물을 찾을 수 없습니다."));
         //조회수 증가 --> 본인이 작성한 글을 조회하는 경우에는 조회수가 증가하지 않음
@@ -85,7 +87,7 @@ public class BoardService {
         List<BoardResponse.PhotoDTO> photoDTOs = photoService.getPhotos(boardId);
 
 
-        BoardResponse.DetailDTO dto = new BoardResponse.DetailDTO(board, repliesDto, photoDTOs, isBookmarked, isLiked, likeCount);
+        BoardResponse.DetailDTO dto = new BoardResponse.DetailDTO(board, repliesDto, photoDTOs, isBookmarked, isLiked, likeCount, user.getImage());
         dto.setOwner(
                 board.getUser().getId().equals(userId) //이 글의 작성자이면 true로 셋팅
         );
@@ -189,9 +191,9 @@ public class BoardService {
         board = boardRepository.save(board);
 
         List<ImageUtil.FileUploadResult> fileUploadResults;
-        if ( writeDto.getImages() != null ) {
+        if (writeDto.getImages() != null) {
             fileUploadResults = ImageUtil.uploadBase64Images(writeDto.getImages());
-            for( ImageUtil.FileUploadResult fileUploadResult : fileUploadResults) {
+            for (ImageUtil.FileUploadResult fileUploadResult : fileUploadResults) {
                 Photo photo = Photo.builder()
                         .board(board)
                         .fileName(fileUploadResult.getFileName())
